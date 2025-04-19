@@ -1,0 +1,32 @@
+```
+@startuml
+
+left to right direction
+actor "Usuario" as usuario
+actor "Aluno" as aluno
+actor "Professor" as professor
+actor "Empresa parceira" as parceiro
+
+rectangle "Sistema de Moeda Estudantil" {
+    usuario --> (Cadastrar no sistema)
+    usuario --> (Entrar no sistema)
+
+    aluno --> (Trocar moeda)
+    aluno --> (Resgatar vantagem)
+    aluno --> (Consultar vantagem)
+    aluno ..> (Consultar extrato) : <<include>>
+    aluno <-- (Conceder moedas)
+    
+    professor--> (Conceder moedas)
+    professor ..> (Consultar extrato) : <<include>>
+
+    parceiro --> (Gerenciar vantagens)
+    parceiro <-- (Resgatar vantagem)
+
+    usuario <|-- aluno
+    usuario <|-- professor
+    usuario <|-- parceiro
+}
+
+@enduml
+```
