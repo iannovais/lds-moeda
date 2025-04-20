@@ -20,7 +20,7 @@ class Aluno {
 }
 
 class Professor {
-  + MAXMOEDAS : int = 1000
+  + MAXMOEDASPORSEMESTRE : int = 1000
   + CPF: String
   + departamento: String
   + saldoMoedas: int
