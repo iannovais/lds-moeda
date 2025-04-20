@@ -17,10 +17,10 @@ class Aluno {
   + endereco: String
   + curso: String
   + saldoMoedas: int
-  + resgatarVantagem(vantagem: Vantagem): void
 }
 
 class Professor {
+  + MAXMOEDAS : int = 1000
   + CPF: String
   + departamento: String
   + saldoMoedas: int
@@ -30,7 +30,6 @@ class Professor {
 class Empresa {
   + CNPJ: String
   + endereco: String
-  + registrarVantagem(vantagem: Vantagem): void
 }
 
 class InstituicaoEnsino {
@@ -47,6 +46,8 @@ class Vantagem {
   + descricao: String
   + foto: String
   + custoMoedas: int
+  + resgatarVantagem(): void
+  + registrarVantagem(): void
 }
 
 class Transacao {
@@ -62,12 +63,12 @@ Usuario <|-- Aluno
 Usuario <|-- Professor
 Usuario <|-- Empresa
 
-Aluno "1" --> "N*" Transacao : recebe/resgata
-Professor "1" --> "N*" Transacao : concede
-Empresa "1" --> "N*" Vantagem : oferece
-Vantagem "1" --> "1" Transacao : utilizada_em
-InstituicaoEnsino "1" --> "N*" Aluno : possui
-InstituicaoEnsino "1" --> "N*" Professor : possui
+Aluno "1" -- "*" Transacao : recebe/resgata
+Professor "1" -- "*" Transacao : concede
+Empresa "1" -- "*" Vantagem : oferece
+Vantagem "1" -- "1" Transacao : utilizada_em
+InstituicaoEnsino "1" -- "*" Aluno : possui
+InstituicaoEnsino "1" -- "*" Professor : possui
 
 @enduml
 ```
