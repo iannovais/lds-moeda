@@ -9,6 +9,7 @@ entity Usuario {
   email: String
   senha: String
   dataCadastro: Date
+  tipo: ENUM
 }
 
 entity Aluno {

@@ -1,12 +1,19 @@
 ```
 @startuml
 
+enum TipoUsuario {
+  professor
+  aluno
+  empresa
+}
+
 class Usuario {
   + id: int
   + nome: String
   + email: String
   + senha: String
   + dataCadastro: Date
+  + tipo: TipoUsuario
   + cadastrar(nome : string, senha : string) : void 
   + login(nome : string, senha : string) : void 
 }
@@ -27,7 +34,7 @@ class Professor extends Usuario {
   + enviarMoedas(aluno: Aluno, quantidade: int, motivo: String): void
 }
 
-class Empresa {
+class Empresa extends Usuario {
   + CNPJ: String
   + endereco: String
 }
@@ -58,10 +65,6 @@ class Transacao {
   + motivo: String
   + codigoCupom: String
 }
-
-Usuario <|-- Aluno
-Usuario <|-- Professor
-Usuario <|-- Empresa
 
 Aluno "1" -- "*" Transacao : recebe/resgata
 Professor "1" -- "*" Transacao : concede
