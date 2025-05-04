@@ -1,4 +1,3 @@
-// src/dao/UsuarioDAO.js
 const db = require('../config/db');
 
 class UsuarioDAO {
