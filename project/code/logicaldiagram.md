@@ -1,3 +1,4 @@
+```
 @startuml
 
 ' Entidades
@@ -81,3 +82,4 @@ Aluno ||--o{ Transacao : resgata
 Professor ||--o{ Transacao : concede
 
 @enduml
+```
