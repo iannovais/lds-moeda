@@ -23,6 +23,6 @@ component "Banco de dados" as BD {
 }
 
 Browser ..> Backend : HTTPS
-Backend ..> BD
+Backend ..> BD : DAO
 @enduml
 ```

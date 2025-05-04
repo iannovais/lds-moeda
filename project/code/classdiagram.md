@@ -11,7 +11,7 @@ class Usuario {
   + login(nome : string, senha : string) : void 
 }
 
-class Aluno {
+class Aluno extends Usuario {
   + CPF: String
   + RG: String
   + endereco: String
@@ -19,7 +19,7 @@ class Aluno {
   + saldoMoedas: int
 }
 
-class Professor {
+class Professor extends Usuario {
   + MAXMOEDASPORSEMESTRE : int = 1000
   + CPF: String
   + departamento: String
