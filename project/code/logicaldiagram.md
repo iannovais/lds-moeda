@@ -1,4 +1,6 @@
 @startuml
+
+' Entidades
 entity Usuario {
   *id: int <<PK>>
   --
@@ -9,7 +11,7 @@ entity Usuario {
 }
 
 entity Aluno {
-  *id: int <<PK,FK>>
+  *id: int <<PK, FK>>
   --
   CPF: String
   RG: String
@@ -19,7 +21,7 @@ entity Aluno {
 }
 
 entity Professor {
-  *id: int <<PK,FK>>
+  *id: int <<PK, FK>>
   --
   CPF: String
   departamento: String
@@ -27,7 +29,7 @@ entity Professor {
 }
 
 entity Empresa {
-  *id: int <<PK,FK>>
+  *id: int <<PK, FK>>
   --
   CNPJ: String
   endereco: String
@@ -74,6 +76,8 @@ InstituicaoEnsino ||--o{ Professor
 
 Empresa ||--o{ Vantagem
 Vantagem ||--|| Transacao : utilizada_em
+
 Aluno ||--o{ Transacao : resgata
 Professor ||--o{ Transacao : concede
+
 @enduml
