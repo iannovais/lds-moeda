@@ -1,4 +1,4 @@
-
+// src/pages/AuthPage.js
 import { useState } from 'react'
 import styled from 'styled-components'
 import Login from '../components/Login'
@@ -10,6 +10,11 @@ const ContainerPagina = styled.div`
   align-items: center;
   justify-content: center;
   background-color: var(--cinza-fundo);
+`
+
+const Conteudo = styled.div`
+  width: 100%;
+  max-width: 400px;
 `
 
 const Alternador = styled.div`
@@ -37,27 +42,22 @@ export default function AuthPage() {
 
   return (
     <ContainerPagina>
-      <div>
+      <Conteudo>
         {modoLogin ? <Login /> : <Registro />}
-        
         <Alternador>
           {modoLogin ? (
             <>
               Não tem uma conta?{' '}
-              <button onClick={() => setModoLogin(false)}>
-                Registre-se
-              </button>
+              <button onClick={() => setModoLogin(false)}>Registre-se</button>
             </>
           ) : (
             <>
               Já tem uma conta?{' '}
-              <button onClick={() => setModoLogin(true)}>
-                Faça login
-              </button>
+              <button onClick={() => setModoLogin(true)}>Faça login</button>
             </>
           )}
         </Alternador>
-      </div>
+      </Conteudo>
     </ContainerPagina>
   )
 }

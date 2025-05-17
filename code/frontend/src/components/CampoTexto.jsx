@@ -1,36 +1,36 @@
+// src/components/CampoTexto.js
 import styled from "styled-components"
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+const Wrapper = styled.div`
+  margin-bottom: 1rem;
 `
 
 const Label = styled.label`
-  font-size: 14px;
-  color: var(--cinza-escuro);
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #333;
 `
 
 const Input = styled.input`
-  padding: 10px;
-  border: 1px solid var(--cinza-claro);
-  border-radius: 5px;
-  font-size: 14px;
-  outline: none;
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background-color: #f7f7f7;
+  color: #333;
 
   &:focus {
-    border-color: var(--dourado);
-    box-shadow: 0 0 0 2px rgba(218, 165, 32, 0.2);
+    border-color: var(--verde-principal);
+    outline: none;
+    background-color: #fff;
   }
 `
 
-const CampoTexto = ({ label, ...props }) => {
+export default function CampoTexto({ label, type = "text", name, required }) {
   return (
-    <Container>
+    <Wrapper>
       <Label>{label}</Label>
-      <Input {...props} />
-    </Container>
+      <Input type={type} name={name} required={required} />
+    </Wrapper>
   )
 }
-
-export default CampoTexto

@@ -1,34 +1,21 @@
+// src/components/Botao.js
 import styled from "styled-components"
 
-const ComponenteBotao = styled.button`
+const StyledButton = styled.button`
   background-color: var(--verde-principal);
-  color: var(--branco);
-  padding: 11px 15px;
+  color: #fff;
   border: none;
-  border-radius: 5px;
-  font-size: 14px;
-  transition: background-color 0.3s;
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-weight: bold;
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+  transition: background-color 0.2s ease;
 
   &:hover {
-    background-color: var(--verde-hover);
-  }
-
-  &:disabled {
-    background-color: var(--verde-disabled);
-    cursor: not-allowed;
+    background-color: #28b463;
   }
 `
 
-const Botao = ({ type = "button", children, onClick, disabled }) => {
-  return (
-    <ComponenteBotao type={type} onClick={onClick} disabled={disabled}>
-      {children}
-    </ComponenteBotao>
-  )
+export default function Botao({ children, ...props }) {
+  return <StyledButton {...props}>{children}</StyledButton>
 }
-
-export default Botao
