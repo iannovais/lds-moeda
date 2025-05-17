@@ -16,7 +16,7 @@ class Aluno extends Usuario {
   - RG: String
   - endereco: String
   - curso: String
-  + saldoMoedas: int
+  - saldoMoedas: int
 }
 
 class Professor extends Usuario {
