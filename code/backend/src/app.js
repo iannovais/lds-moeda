@@ -1,14 +1,18 @@
-const express = require('express');
-const cors = require('cors'); 
+const express = require("express");
+const bodyParser = require("body-parser");
+const authRoutes = require("./routes/authRoutes");
+const usuarioRoutes = require("./routes/usuarioRoutes");
+const alunoRoutes = require("./routes/alunoRoutes");
+const empresaRoutes = require("./routes/empresaRoutes");
+
 const app = express();
+app.use(bodyParser.json());
 
-app.use(cors()); 
-app.use(express.json());
+app.use("/api/auth", authRoutes);
 
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-});
+app.use("/api/usuarios", usuarioRoutes);
+app.use("/api/alunos", alunoRoutes);
+app.use("/api/empresas", empresaRoutes);
 
-app.listen(3000, () => {
-  console.log('Servidor rodando na porta 3000');
-});
+const PORT = 3000;
+app.listen(PORT, () => console.log(`Servidor rodando online e roteando 😎`));

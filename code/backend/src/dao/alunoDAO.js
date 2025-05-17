@@ -1,29 +1,45 @@
-const db = require('../config/db');
-const UsuarioDAO = require('./UsuarioDAO');
+const pool = require("../config/db");
+const Aluno = require("../models/aluno");
+const UsuarioDAO = require("../dao/UsuarioDAO");
 
 class AlunoDAO {
-    static async criar(aluno) {
-        const usuarioId = await UsuarioDAO.criar(aluno);
+    async criar(alunoData) {
+        const usuarioDAO = require("./UsuarioDAO");
+        const usuario = await usuarioDAO.criar({ ...alunoData, tipo: "aluno" });
 
-        await db.execute(`
-            INSERT INTO aluno (usuario_id, cpf, rg, endereco, curso, saldo_moedas)
-            VALUES (?, ?, ?, ?, ?, ?)
-            `, [usuarioId, aluno.cpf, aluno.rg, aluno.endereco, aluno.curso, aluno.saldoMoedas || 0]
+        await pool.execute(
+            "INSERT INTO Aluno (id, cpf, rg, endereco, curso) VALUES (?, ?, ?, ?, ?)",
+            [usuario.id, alunoData.cpf, alunoData.rg, alunoData.endereco, alunoData.curso]
         );
 
-        return { id: usuarioId, ...aluno };
+        return new Aluno({ ...usuario, ...alunoData });
     }
 
-    static async buscarPorId(id) {
-        const [rows] = await db.execute(`
-        SELECT *
-        FROM usuario u
-        JOIN alunos a ON u.id = a.usuario_id
-        WHERE u.id = ?
-    `, [id]);
+    async buscarPorID(id) {
+        const [rows] = await pool.execute("SELECT * FROM Aluno WHERE id = ?", [id]);
+        return rows[0] ? new Aluno(rows[0]) : null;
+    }
 
-        return rows[0];
+    async listarTodos() {
+        const [rows] = await pool.execute("SELECT * FROM Aluno");
+        return rows.map((row) => new Aluno(row));
+    }
+
+    async atualizar(id, dadosAtualizados) {
+        const { cpf, rg, endereco, curso, saldomoedas } = dadosAtualizados;
+
+        await pool.execute(
+            "UPDATE Aluno SET cpf = ?, rg = ?, endereco = ?, curso = ?, saldoMoedas = ? WHERE id = ?",
+            [cpf, rg, endereco, curso, saldomoedas, id]
+        );
+
+        const [rows] = await pool.execute("SELECT * FROM Aluno WHERE id = ?", [id]);
+        return rows[0] ? new Aluno(rows[0]) : null;
+    }
+
+    async deletar(id) {
+        await UsuarioDAO.deletar(id);
     }
 }
 
-module.exports = AlunoDAO;
+module.exports = new AlunoDAO();
