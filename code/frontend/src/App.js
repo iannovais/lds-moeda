@@ -1,9 +1,8 @@
-// code/frontend/src/App.js
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Login from './components/Login';
-import Registro from './components/Registro';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import Login from './pages/login'
+import Registro from './pages/registro'
 
-function App() {
+export default function App() {
   return (
     <Router>
       <Routes>
@@ -12,7 +11,5 @@ function App() {
         <Route path="/registro" element={<Registro />} />
       </Routes>
     </Router>
-  );
+  )
 }
-
-export default App;

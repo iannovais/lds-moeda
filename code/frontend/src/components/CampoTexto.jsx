@@ -1,4 +1,3 @@
-// src/components/CampoTexto.js
 import styled from "styled-components"
 
 const Wrapper = styled.div`
@@ -26,11 +25,11 @@ const Input = styled.input`
   }
 `
 
-export default function CampoTexto({ label, type = "text", name, required }) {
+export default function CampoTexto({ label, ...props }) {
   return (
     <Wrapper>
       <Label>{label}</Label>
-      <Input type={type} name={name} required={required} />
+      <Input {...props} />
     </Wrapper>
   )
 }
