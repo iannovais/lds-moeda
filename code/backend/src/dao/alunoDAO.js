@@ -3,17 +3,18 @@ const Aluno = require("../models/aluno");
 const UsuarioDAO = require("../dao/UsuarioDAO");
 
 class AlunoDAO {
-    async criar(alunoData) {
-        const usuarioDAO = require("./UsuarioDAO");
-        const usuario = await usuarioDAO.criar({ ...alunoData, tipo: "aluno" });
+    async criar(idUsuario, dadosAluno) {
+        const { cpf, rg, endereco, curso } = dadosAluno;
 
         await pool.execute(
             "INSERT INTO Aluno (id, cpf, rg, endereco, curso) VALUES (?, ?, ?, ?, ?)",
-            [usuario.id, alunoData.cpf, alunoData.rg, alunoData.endereco, alunoData.curso]
+            [idUsuario, cpf, rg, endereco, curso]
         );
 
-        return new Aluno({ ...usuario, ...alunoData });
+        const [rows] = await pool.execute("SELECT * FROM Aluno WHERE id = ?", [idUsuario]);
+        return rows[0] ? new Aluno(rows[0]) : null;
     }
+
 
     async buscarPorID(id) {
         const [rows] = await pool.execute("SELECT * FROM Aluno WHERE id = ?", [id]);

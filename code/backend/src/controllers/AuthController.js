@@ -1,15 +1,17 @@
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
 const UsuarioDAO = require("../dao/UsuarioDAO");
 const AlunoDAO = require("../dao/alunoDAO");
 const EmpresaDAO = require("../dao/EmpresaDAO");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+
 const { JWT_SECRET } = require("../config/config");
 
 class AuthController {
   async registrar(req, res) {
-    try {
-      const { nome, email, senha, tipo, ...dadosEspecificos } = req.body;
+    const { tipo, nome, email, senha, ...dadosRestantes } = req.body;
 
+    try {
       const usuarioExistente = await UsuarioDAO.buscarPorEmail(email);
       if (usuarioExistente) {
         return res.status(400).json({ erro: "E-mail já cadastrado." });
@@ -17,32 +19,40 @@ class AuthController {
 
       const senhaHash = bcrypt.hashSync(senha, 10);
 
-      let novoUsuario;
+      const novoUsuario = await UsuarioDAO.criar({
+        nome,
+        email,
+        senha: senhaHash,
+        tipo
+      });
+
+      let resultado;
       if (tipo === "aluno") {
-        novoUsuario = await AlunoDAO.criar({ nome, email, senha: senhaHash, ...dadosEspecificos });
+        resultado = await AlunoDAO.criar(novoUsuario.id, dadosRestantes);
       } else if (tipo === "empresa") {
-        novoUsuario = await EmpresaDAO.criar({ nome, email, senha: senhaHash, ...dadosEspecificos });
+        resultado = await EmpresaDAO.criar(novoUsuario.id, dadosRestantes);
       } else {
         return res.status(400).json({ erro: "Tipo de usuário inválido." });
       }
 
-      res.status(201).json({ mensagem: "Usuário criado com sucesso!", usuario: novoUsuario });
-    } catch (error) {
-      res.status(500).json({ erro: "Erro ao registrar usuário." });
+      return res.status(201).json({
+        mensagem: "Usuário criado com sucesso!",
+        usuario: { ...novoUsuario, ...resultado }
+      });
+
+    } catch (erro) {
+      console.error(erro);
+      return res.status(500).json({ erro: "Erro interno ao registrar usuário." });
     }
   }
 
   async login(req, res) {
+    const { email, senha } = req.body;
+
     try {
-      const { email, senha } = req.body;
-
       const usuario = await UsuarioDAO.buscarPorEmail(email);
-      if (!usuario) {
-        return res.status(401).json({ erro: "E-mail ou senha incorretos." });
-      }
 
-      const senhaValida = bcrypt.compareSync(senha, usuario.senha);
-      if (!senhaValida) {
+      if (!usuario || !bcrypt.compareSync(senha, usuario.senha)) {
         return res.status(401).json({ erro: "E-mail ou senha incorretos." });
       }
 
@@ -52,9 +62,14 @@ class AuthController {
         { expiresIn: "1h" }
       );
 
-      res.status(200).json({ mensagem: "Login bem-sucedido!", token });
-    } catch (error) {
-      res.status(500).json({ erro: "Erro ao fazer login." });
+      return res.status(200).json({
+        mensagem: "Login bem-sucedido!",
+        token
+      });
+
+    } catch (erro) {
+      console.error(erro);
+      return res.status(500).json({ erro: "Erro interno ao realizar login." });
     }
   }
 }

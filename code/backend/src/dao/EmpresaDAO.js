@@ -3,16 +3,16 @@ const Empresa = require("../models/Empresa");
 const UsuarioDAO = require("../dao/UsuarioDAO");
 
 class EmpresaDAO {
-    async criar(empresaData) {
-        const usuarioDAO = require("./UsuarioDAO");
-        const usuario = await usuarioDAO.criar({ ...empresaData, tipo: "empresa" });
+    async criar(idUsuario, dadosEmpresa) {
+        const { cnpj, endereco } = dadosEmpresa;
 
         await pool.execute(
             "INSERT INTO Empresa (id, cnpj, endereco) VALUES (?, ?, ?)",
-            [usuario.id, empresaData.cnpj, empresaData.endereco]
+            [idUsuario, cnpj, endereco]
         );
 
-        return new Empresa({ ...usuario, ...empresaData });
+        const [rows] = await pool.execute("SELECT * FROM Empresa WHERE id = ?", [idUsuario]);
+        return rows[0] ? new Empresa(rows[0]) : null;
     }
 
     async buscarPorID(id) {
