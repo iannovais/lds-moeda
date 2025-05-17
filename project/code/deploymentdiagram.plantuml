@@ -16,13 +16,12 @@ node "Banco de Dados" as bd {
     [Database]
 }
 
-[Navegador] ..> [Backend]
 [Navegador] ..> [Frontend]
 [Frontend] ..> [Backend]
 [Backend] ..> [Database]
 
 computador --> servidor : HTTPS
-servidor --> bd : DAO
+servidor --> bd : ODBC
 
 @enduml
 ```

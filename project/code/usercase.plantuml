@@ -14,11 +14,11 @@ rectangle "Sistema de Moeda Estudantil" {
     aluno --> (Trocar moeda)
     aluno --> (Resgatar vantagem)
     aluno --> (Consultar vantagem)
-    aluno ..> (Consultar extrato) : <<include>>
+    aluno --> (Consultar extrato)
     aluno <-- (Conceder moedas)
     
-    professor--> (Conceder moedas)
-    professor ..> (Consultar extrato) : <<include>>
+    professor --> (Conceder moedas)
+    professor --> (Consultar extrato) 
 
     parceiro --> (Gerenciar vantagens)
     parceiro <-- (Resgatar vantagem)

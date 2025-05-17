@@ -4,9 +4,7 @@ component "FrontEnd" as Browser
 
 component "Backend" as Backend {
   component "Autenticação"
-  component "Gerenciamento de Aluno"
-  component "Gerenciamento de Professor"
-  component "Gerenciamento de Empresa"
+  component "Gerenciamento de Usuário"
   component "Gerenciamento de Vantagem"
   component "Gerenciamento de Instituição de Ensino"
   component "Gerenciamento de Moeda"
@@ -23,6 +21,6 @@ component "Banco de dados" as BD {
 }
 
 Browser ..> Backend : HTTPS
-Backend ..> BD : DAO
+Backend ..> BD : ODBC
 @enduml
 ```

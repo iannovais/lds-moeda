@@ -1,7 +1,6 @@
 ```
 @startuml
 
-' Entidades
 entity Usuario {
   *id: int <<PK>>
   --
@@ -68,7 +67,6 @@ entity Transacao {
   vantagem_id: int <<FK>>
 }
 
-' Relacionamentos
 Usuario ||--|| Aluno
 Usuario ||--|| Professor
 Usuario ||--|| Empresa
