@@ -11,3 +11,7 @@
 6. Conceder Moedas: Como professor, quero enviar moedas para um aluno, indicando o motivo do reconhecimento, para recompensá-lo por seu desempenho.
 
 7. Gerenciar Vantagens: Como empresa parceira, quero cadastrar, editar ou remover vantagens no sistema, para que os alunos possam trocar moedas por benefícios oferecidos pela minha empresa.
+
+8. Resgatar Vantagem com Código: Como aluno, quero resgatar uma vantagem utilizando minhas moedas, para que eu possa obter o benefício desejado e receber um código por email para apresentar na troca presencial.
+
+9. Notificação por Email: Como aluno, quero receber uma notificação por email sempre que eu for reconhecido com moedas por um professor, para que eu saiba que fui valorizado e possa acompanhar meu saldo no sistema.
