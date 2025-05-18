@@ -59,7 +59,7 @@ export default function LoginPage() {
     <Container>
       <CardForm>
         <Titulo>Acesse sua conta</Titulo>
-        
+
         {erro && <div style={{ color: '#c92a2a', marginBottom: '1rem' }}>{erro}</div>}
 
         <form onSubmit={handleSubmit}>
@@ -81,8 +81,8 @@ export default function LoginPage() {
             required
           />
 
-          <Botao 
-            tipo="primario" 
+          <Botao
+            tipo="primario"
             estilo={{ width: '100%', marginTop: '1.5rem' }}
           >
             Entrar

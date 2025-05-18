@@ -50,8 +50,7 @@ export default function RegistroPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
-    // Construir payload específico
+
     const payload = {
       nome: dados.nome,
       email: dados.email,
@@ -88,7 +87,7 @@ export default function RegistroPage() {
     <Container>
       <CardForm>
         <Titulo>Criar nova conta</Titulo>
-        
+
         {erro && <div style={{ color: '#c92a2a', marginBottom: '1rem' }}>{erro}</div>}
 
         <form onSubmit={handleSubmit}>
@@ -193,8 +192,8 @@ export default function RegistroPage() {
             </>
           )}
 
-          <Botao 
-            tipo="primario" 
+          <Botao
+            tipo="primario"
             estilo={{ width: '100%', marginTop: '2rem' }}
           >
             Criar conta

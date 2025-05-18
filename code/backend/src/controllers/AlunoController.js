@@ -24,11 +24,11 @@ class AlunoController {
         try {
             const { id } = req.params;
             const aluno = await AlunoDAO.buscarPorID(id);
-            
+
             if (!aluno) {
                 return res.status(404).json({ erro: "Aluno não encontrado" });
             }
-            
+
             res.status(200).json(aluno);
         } catch (error) {
             res.status(500).json({ erro: "Erro ao buscar aluno" });

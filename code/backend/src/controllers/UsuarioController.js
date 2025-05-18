@@ -6,7 +6,7 @@ class UsuarioController {
             const usuarios = await UsuarioDAO.listarTodos();
             res.status(200).json(usuarios);
         } catch (error) {
-            console.error("Erro:", error); 
+            console.error("Erro:", error);
             res.status(500).json({ erro: "Erro ao buscar usuários." });
         }
     }
