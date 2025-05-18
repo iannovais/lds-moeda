@@ -142,6 +142,7 @@ export default function PerfilPage() {
         error.response?.data || error.message
       );
       setErro("Erro ao atualizar dados");
+      setTimeout(() => setErro(""), 3000);
     }
   };
 
