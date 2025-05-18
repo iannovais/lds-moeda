@@ -1,16 +1,17 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import Login from './pages/login'
+import Registro from './pages/registro'
+import Perfil from './pages/perfil' // Adicione esta linha
 
-function App() {
-  const [mensagem, setMensagem] = useState('');
-
-  useEffect(() => {
-    axios.get('http://localhost:3000')
-      .then(res => setMensagem(res.data))
-      .catch(err => console.error(err));
-  }, []);
-
-  return <h1>{mensagem}</h1>;
+export default function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/registro" element={<Registro />} />
+        <Route path="/perfil" element={<Perfil />} /> {/* Adicione esta linha */}
+      </Routes>
+    </Router>
+  )
 }
-
-export default App;

@@ -24,11 +24,11 @@ class EmpresaController {
         try {
             const { id } = req.params;
             const empresa = await EmpresaDAO.buscarPorID(id);
-            
+
             if (!empresa) {
                 return res.status(404).json({ erro: "Empresa não encontrada" });
             }
-            
+
             res.status(200).json(empresa);
         } catch (error) {
             res.status(500).json({ erro: "Erro ao buscar empresa" });
@@ -51,7 +51,7 @@ class EmpresaController {
             await EmpresaDAO.deletar(id);
             res.status(204).end();
         } catch (error) {
-            console.error("Erro:", error); 
+            console.error("Erro:", error);
             res.status(500).json({ erro: "Erro ao deletar empresa" });
         }
     }
