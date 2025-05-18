@@ -1,5 +1,5 @@
-```
 @startuml
+left to right direction
 
 class Usuario {
   - id: int
@@ -70,4 +70,3 @@ InstituicaoEnsino "1" -- "*" Aluno : possui
 InstituicaoEnsino "1" -- "*" Professor : possui
 
 @enduml
-```

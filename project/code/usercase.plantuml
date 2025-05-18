@@ -1,4 +1,3 @@
-```
 @startuml
 
 left to right direction
@@ -29,4 +28,3 @@ rectangle "Sistema de Moeda Estudantil" {
 }
 
 @enduml
-```
