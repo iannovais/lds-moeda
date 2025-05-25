@@ -38,6 +38,27 @@ const Titulo = styled.h1`
   font-size: 1.8rem;
 `;
 
+const SectionVantagens = styled.div`
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #dee2e6;
+`;
+
+const VantagemCard = styled.div`
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+`;
+
+const FormVantagem = styled.div`
+  background: #f1f3f5;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+`;
+
 export default function PerfilPage() {
   const [dados, setDados] = useState({
     nome: "",
@@ -54,6 +75,14 @@ export default function PerfilPage() {
   const [sucesso, setSucesso] = useState("");
   const [tipoUsuario, setTipoUsuario] = useState("");
   const [idUsuario, setIdUsuario] = useState("");
+  const [vantagens, setVantagens] = useState([]);
+  const [novaVantagem, setNovaVantagem] = useState({
+    nome: "",
+    descricao: "",
+    foto: "",
+    custoMoedas: 0
+  });
+  const [erroVantagem, setErroVantagem] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -71,17 +100,13 @@ export default function PerfilPage() {
 
         const { data: usuario } = await axios.get(
           `http://localhost:3000/api/usuarios/${decoded.id}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
 
         const endpoint = decoded.tipo === "aluno" ? "alunos" : "empresas";
         const { data: detalhes } = await axios.get(
           `http://localhost:3000/api/${endpoint}/${decoded.id}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
 
         setDados({ ...usuario, ...detalhes });
@@ -93,6 +118,32 @@ export default function PerfilPage() {
 
     carregarPerfil();
   }, [navigate]);
+
+  useEffect(() => {
+    const carregarVantagens = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        let endpoint = "/api/vantagens";
+        if (tipoUsuario === "empresa") {
+          endpoint = "/api/vantagens/minhas-vantagens";
+        }
+
+        const { data } = await axios.get(`http://localhost:3000${endpoint}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        setVantagens(data);
+      } catch (error) {
+        console.error("Erro ao carregar vantagens:", error);
+      }
+    };
+
+    if (tipoUsuario) {
+      carregarVantagens();
+    }
+  }, [tipoUsuario]);
 
   const handleChange = (e) => {
     setDados({
@@ -137,10 +188,7 @@ export default function PerfilPage() {
       setSucesso("Dados atualizados com sucesso!");
       setTimeout(() => setSucesso(""), 3000);
     } catch (error) {
-      console.error(
-        "Erro ao atualizar dados:",
-        error.response?.data || error.message
-      );
+      console.error("Erro ao atualizar dados:", error.response?.data || error.message);
       setErro("Erro ao atualizar dados");
       setTimeout(() => setErro(""), 3000);
     }
@@ -161,10 +209,7 @@ export default function PerfilPage() {
       localStorage.removeItem("token");
       navigate("/login");
     } catch (error) {
-      console.error(
-        "Erro ao excluir conta:",
-        error.response?.data || error.message
-      );
+      console.error("Erro ao excluir conta:", error.response?.data || error.message);
       setErro("Erro ao excluir conta");
     }
   };
@@ -173,6 +218,51 @@ export default function PerfilPage() {
     localStorage.removeItem("token");
     navigate("/login");
   };
+
+  const handleCriarVantagem = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      const { data } = await axios.post(
+        "http://localhost:3000/api/vantagens",
+        novaVantagem,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      setVantagens([...vantagens, data]);
+      setNovaVantagem({ nome: "", descricao: "", foto: "", custoMoedas: 0 });
+      setErroVantagem("");
+    } catch (error) {
+      setErroVantagem(error.response?.data?.erro || "Erro ao criar vantagem");
+    }
+  };
+
+  const renderVantagens = () => (
+    <div>
+      <h3>{tipoUsuario === "empresa" ? "Minhas Vantagens" : "Vantagens Disponíveis"}</h3>
+      {vantagens.length === 0 ? (
+        <p>Nenhuma vantagem encontrada</p>
+      ) : (
+        vantagens.map((vantagem) => (
+          <VantagemCard key={vantagem.id}>
+            {vantagem.foto && (
+              <img 
+                src={vantagem.foto} 
+                alt={vantagem.nome} 
+                style={{ maxWidth: "100px", marginBottom: "1rem" }}
+              />
+            )}
+            <h4>{vantagem.nome}</h4>
+            <p>{vantagem.descricao}</p>
+            <div>Custo: {vantagem.custoMoedas} moedas</div>
+            {tipoUsuario === "empresa" && (
+              <small>Cadastrada em: {new Date(vantagem.data_cadastro).toLocaleDateString()}</small>
+            )}
+          </VantagemCard>
+        ))
+      )}
+    </div>
+  );
 
   return (
     <Container>
@@ -320,6 +410,62 @@ export default function PerfilPage() {
             </Botao>
           </div>
         </form>
+
+        <SectionVantagens>
+          {erroVantagem && (
+            <div style={{ color: "#c92a2a", marginBottom: "1rem" }}>{erroVantagem}</div>
+          )}
+
+          {tipoUsuario === "empresa" && (
+            <FormVantagem>
+              <h3>Cadastrar Nova Vantagem</h3>
+              <form onSubmit={handleCriarVantagem}>
+                <CampoTexto
+                  label="Nome"
+                  name="nome"
+                  value={novaVantagem.nome}
+                  onChange={(e) => setNovaVantagem({...novaVantagem, nome: e.target.value})}
+                  required
+                />
+                <CampoTexto
+                  label="Descrição"
+                  name="descricao"
+                  value={novaVantagem.descricao}
+                  onChange={(e) => setNovaVantagem({...novaVantagem, descricao: e.target.value})}
+                  required
+                />
+                <CampoTexto
+                  label="URL da Foto"
+                  name="foto"
+                  type="url"
+                  value={novaVantagem.foto}
+                  onChange={(e) => setNovaVantagem({...novaVantagem, foto: e.target.value})}
+                />
+                <CampoTexto
+                  label="Custo em Moedas"
+                  name="custoMoedas"
+                  type="number"
+                  value={novaVantagem.custoMoedas}
+                  onChange={(e) => setNovaVantagem({
+                    ...novaVantagem, 
+                    custoMoedas: parseFloat(e.target.value)
+                  })}
+                  min="0"
+                  step="0.01"
+                  required
+                />
+                <Botao
+                  tipo="primario"
+                  estilo={{ marginTop: "1rem" }}
+                >
+                  Cadastrar Vantagem
+                </Botao>
+              </form>
+            </FormVantagem>
+          )}
+
+          {renderVantagens()}
+        </SectionVantagens>
       </CardForm>
     </Container>
   );

@@ -86,7 +86,7 @@ export default function RegistroPage() {
   return (
     <Container>
       <CardForm>
-        <Titulo>Criar nova conta</Titulo>
+        <Titulo>Criar nova Conta</Titulo>
 
         {erro && <div style={{ color: '#c92a2a', marginBottom: '1rem' }}>{erro}</div>}
 

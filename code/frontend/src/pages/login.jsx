@@ -58,7 +58,7 @@ export default function LoginPage() {
   return (
     <Container>
       <CardForm>
-        <Titulo>Acesse sua conta</Titulo>
+        <Titulo>Acesse sua Conta</Titulo>
 
         {erro && <div style={{ color: '#c92a2a', marginBottom: '1rem' }}>{erro}</div>}
 
@@ -90,7 +90,7 @@ export default function LoginPage() {
         </form>
 
         <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-          Novo usuário? {' '}
+          Novo Usuário? {' '}
           <button
             onClick={() => navigate('/registro')}
             style={{
