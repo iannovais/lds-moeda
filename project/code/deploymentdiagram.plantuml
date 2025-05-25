@@ -19,7 +19,7 @@ node "Banco de Dados" as bd {
 [Frontend] ..> [Backend]
 [Backend] ..> [Database]
 
-computador --> servidor : HTTPS
-servidor --> bd : ODBC
+computador -- servidor : HTTPS
+servidor -- bd : ODBC
 
 @enduml
