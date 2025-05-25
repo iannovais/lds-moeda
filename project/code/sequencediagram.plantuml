@@ -1,0 +1,67 @@
+@startuml
+actor "Empresa Parceira" as parceiro
+actor "Aluno" as aluno
+participant "Rota" as sistema
+participant "VantagemController" as controller
+participant "VantagemDAO" as dao
+database "Banco de Dados" as bd
+
+parceiro -> sistema: POST /vantagens
+activate parceiro
+    activate sistema
+        sistema -> controller: criar(req, res)
+        activate controller
+            controller -> dao: criar(dados)
+            activate dao
+                dao -> bd: INSERT vantagem
+                activate bd
+                bd --> dao
+                deactivate bd
+                
+            dao --> controller
+            deactivate dao
+        controller --> sistema
+        deactivate controller
+    sistema --> parceiro
+    deactivate sistema
+deactivate parceiro
+
+    parceiro -> sistema: GET /vantagens/minhas-vantagens
+activate parceiro
+    activate sistema
+        sistema -> controller: listarPorEmpresa()
+        activate controller
+            controller -> dao: listarPorEmpresa()
+            activate dao
+                dao -> bd: SELECT vantagens WHERE empresa_id
+                activate bd
+                bd --> dao
+                deactivate bd
+            dao --> controller
+            deactivate dao
+        controller --> sistema
+        deactivate controller
+    sistema --> parceiro
+    deactivate sistema
+deactivate parceiro
+
+aluno -> sistema: GET /vantagens
+activate aluno
+    activate sistema
+        sistema -> controller: listarAtivas()
+        activate controller
+            controller -> dao: listarAtivas()
+            activate dao
+                dao -> bd: SELECT vantagens WHERE ativas
+                activate bd
+                bd --> dao: lista de vantagens ativas
+                deactivate bd
+            dao --> controller: lista
+            deactivate dao
+        controller --> sistema: resposta
+        deactivate controller
+    sistema --> aluno: lista de vantagens ativas
+    deactivate sistema
+deactivate aluno
+
+@enduml
