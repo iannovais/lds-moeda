@@ -39,11 +39,6 @@ const Titulo = styled.h1`
   font-size: 1.8rem;
 `;
 
-const SectionVantagens = styled.div`
-  margin-top: 3rem;
-  padding-top: 2rem;
-  border-top: 1px solid #dee2e6;
-`;
 
 const VantagensGrid = styled.div`
   display: grid;
@@ -126,10 +121,6 @@ const Mensagem = styled.div`
   font-weight: 500;
 `;
 
-const MensagemSucesso = styled(Mensagem)`
-  background-color: #d4edda;
-  color: #155724;
-`;
 
 const MensagemErro = styled(Mensagem)`
   background-color: #f8d7da;
