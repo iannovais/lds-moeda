@@ -1,4 +1,5 @@
 @startuml
+
 actor "Empresa Parceira" as parceiro
 actor "Aluno" as aluno
 participant "Rota" as sistema
@@ -6,34 +7,23 @@ participant "VantagemController" as controller
 participant "VantagemDAO" as dao
 database "Banco de Dados" as bd
 
-parceiro -> sistema: POST /vantagens
-activate parceiro
-    activate sistema
-        sistema -> controller: criar(req, res)
-        activate controller
-            controller -> dao: criar(dados)
-            activate dao
-                dao -> bd: INSERT vantagem
-                activate bd
-                bd --> dao
-                deactivate bd
-                
-            dao --> controller
-            deactivate dao
-        controller --> sistema
-        deactivate controller
-    sistema --> parceiro
-    deactivate sistema
-deactivate parceiro
+ref over parceiro, aluno : Realizar login
 
-    parceiro -> sistema: GET /vantagens/minhas-vantagens
+autonumber 1
+parceiro -> sistema : POST /vantagens
 activate parceiro
+
+    autonumber 1.1
     activate sistema
-        sistema -> controller: listarPorEmpresa()
+        sistema -> controller : criar(req, res)
+
+        autonumber 1.1.1
         activate controller
-            controller -> dao: listarPorEmpresa()
+            controller -> dao : criar(dados)
+
+            autonumber 1.1.1.1
             activate dao
-                dao -> bd: SELECT vantagens WHERE empresa_id
+                dao -> bd : INSERT vantagem
                 activate bd
                 bd --> dao
                 deactivate bd
@@ -45,22 +35,55 @@ activate parceiro
     deactivate sistema
 deactivate parceiro
 
-aluno -> sistema: GET /vantagens
+autonumber 2
+parceiro -> sistema : GET /vantagens/minhas-vantagens
+activate parceiro
+
+    autonumber 2.1
+    activate sistema
+        sistema -> controller : listarPorEmpresa()
+
+        autonumber 2.1.1
+        activate controller
+            controller -> dao : listarPorEmpresa()
+
+            autonumber 2.1.1.1
+            activate dao
+                dao -> bd : SELECT vantagens WHERE empresa_id
+                activate bd
+                bd --> dao
+                deactivate bd
+            dao --> controller
+            deactivate dao
+        controller --> sistema
+        deactivate controller
+    sistema --> parceiro
+    deactivate sistema
+deactivate parceiro
+
+autonumber 3
+aluno -> sistema : GET /vantagens
 activate aluno
+
+    autonumber 3.1
     activate sistema
-        sistema -> controller: listarAtivas()
+        sistema -> controller : listarAtivas()
+
+        autonumber 3.1.1
         activate controller
-            controller -> dao: listarAtivas()
+            controller -> dao : listarAtivas()
+
+            autonumber 3.1.1.1
             activate dao
-                dao -> bd: SELECT vantagens WHERE ativas
+                dao -> bd : SELECT vantagens WHERE ativas
                 activate bd
-                bd --> dao: lista de vantagens ativas
+                bd --> dao
                 deactivate bd
-            dao --> controller: lista
+            dao --> controller
             deactivate dao
-        controller --> sistema: resposta
+        controller --> sistema
         deactivate controller
-    sistema --> aluno: lista de vantagens ativas
+    sistema --> aluno
     deactivate sistema
 deactivate aluno
 
