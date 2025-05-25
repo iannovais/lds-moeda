@@ -10,6 +10,7 @@ class VantagemController {
 
             const dadosVantagem = {
                 ...req.body,
+                foto: req.file ? `/uploads/${req.file.filename}` : null,
                 empresa_id: req.usuario.id
             };
 
@@ -20,6 +21,7 @@ class VantagemController {
             res.status(500).json({ erro: "Erro ao criar vantagem" });
         }
     }
+
 
     async listarTodasAtivas(req, res) {
         try {

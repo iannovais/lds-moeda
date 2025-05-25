@@ -5,14 +5,7 @@ import { jwtDecode } from "jwt-decode";
 import styled from "styled-components";
 import Botao from "../components/Botao";
 import CampoTexto from "../components/CampoTexto";
-
-const SectionTitulo = styled.h2`
-  font-size: 1.2rem;
-  color: #495057;
-  margin: 1.5rem 0 1rem;
-  border-bottom: 1px solid #dee2e6;
-  padding-bottom: 0.5rem;
-`;
+import FileUpload from "../components/Upload"
 
 const Container = styled.div`
   min-height: 100vh;
@@ -39,7 +32,6 @@ const Titulo = styled.h1`
   font-size: 1.8rem;
 `;
 
-
 const VantagensGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -54,7 +46,7 @@ const VantagemCard = styled.div`
   border: 1px solid #e9ecef;
   transition: all 0.3s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  
+
   &:hover {
     transform: translateY(-3px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -121,7 +113,6 @@ const Mensagem = styled.div`
   font-weight: 500;
 `;
 
-
 const MensagemErro = styled(Mensagem)`
   background-color: #f8d7da;
   color: #721c24;
@@ -132,9 +123,9 @@ export default function VantagensPage() {
   const [novaVantagem, setNovaVantagem] = useState({
     nome: "",
     descricao: "",
-    foto: "",
     custoMoedas: 0,
   });
+  const [fotoArquivo, setFotoArquivo] = useState(null);
   const [erro, setErro] = useState("");
   const [tipoUsuario, setTipoUsuario] = useState("");
   const navigate = useNavigate();
@@ -151,13 +142,20 @@ export default function VantagensPage() {
   }, [navigate]);
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    const decoded = jwtDecode(token);
+    const tipo = decoded.tipo;
+    setTipoUsuario(tipo);
+
     const carregarVantagens = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
-
         let endpoint = "/api/vantagens";
-        if (tipoUsuario === "empresa") {
+        if (tipo === "empresa") {
           endpoint = "/api/vantagens/minhas-vantagens";
         }
 
@@ -171,56 +169,82 @@ export default function VantagensPage() {
       }
     };
 
-    if (tipoUsuario) {
-      carregarVantagens();
+    carregarVantagens();
+  }, [navigate]);
+
+  const handleArquivoFoto = (e) => {
+    const arquivo = e.target.files[0];
+    if (arquivo) {
+      setFotoArquivo(arquivo);
     }
-  }, [tipoUsuario]);
+  };
 
   const handleCriarVantagem = async (e) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
+
+      const formData = new FormData();
+      formData.append("nome", novaVantagem.nome);
+      formData.append("descricao", novaVantagem.descricao);
+      formData.append("custoMoedas", novaVantagem.custoMoedas);
+      if (fotoArquivo) {
+        formData.append("foto", fotoArquivo);
+      }
+
       const { data } = await axios.post(
         "http://localhost:3000/api/vantagens",
-        novaVantagem,
+        formData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       setVantagens([...vantagens, data]);
-      setNovaVantagem({ nome: "", descricao: "", foto: "", custoMoedas: 0 });
+      setNovaVantagem({ nome: "", descricao: "", custoMoedas: 0 });
+      setFotoArquivo(null);
       setErro("");
     } catch (error) {
       setErro(error.response?.data?.erro || "Erro ao criar vantagem");
     }
   };
 
+  function obterUrlFoto(foto) {
+    if (!foto || foto.trim() === "") {
+      return "https://placehold.co/300x160?text=Sem+Imagem";
+    }
+    if (foto.startsWith("http")) {
+      return foto;
+    }
+    const caminho = foto.startsWith("/") ? foto.substring(1) : foto;
+    return `http://localhost:3000/${caminho}`;
+  }
+
   const renderVantagens = () => (
     <div>
       <FormTitulo>
-        {tipoUsuario === "empresa" ? "Minhas Vantagens" : "Vantagens Disponíveis"}
+        {tipoUsuario === "empresa"
+          ? "Minhas Vantagens"
+          : "Vantagens Disponíveis"}
       </FormTitulo>
-      
+
       {vantagens.length === 0 ? (
-        <p style={{ color: "#868e96", textAlign: "center" }}>Nenhuma vantagem encontrada</p>
+        <p style={{ color: "#868e96", textAlign: "center" }}>
+          Nenhuma vantagem encontrada
+        </p>
       ) : (
         <VantagensGrid>
           {vantagens.map((vantagem) => (
             <VantagemCard key={vantagem.id}>
-              {vantagem.foto && (
-                <VantagemImagem 
-                  src={vantagem.foto} 
-                  alt={vantagem.nome}
-                  onError={(e) => {
-                    e.target.src = "https://via.placeholder.com/300x160?text=Sem+Imagem";
-                  }}
-                />
-              )}
+              <VantagemImagem
+                src={obterUrlFoto(vantagem.foto)}
+                alt={vantagem.nome}
+              />
               <VantagemTitulo>{vantagem.nome}</VantagemTitulo>
               <VantagemDescricao>{vantagem.descricao}</VantagemDescricao>
               <VantagemPreco>{vantagem.custoMoedas} moedas</VantagemPreco>
               {tipoUsuario === "empresa" && (
                 <VantagemData>
-                  Cadastrada em: {new Date(vantagem.data_cadastro).toLocaleDateString()}
+                  Cadastrada em:{" "}
+                  {new Date(vantagem.data_cadastro).toLocaleDateString()}
                 </VantagemData>
               )}
             </VantagemCard>
@@ -244,7 +268,7 @@ export default function VantagensPage() {
         {tipoUsuario === "empresa" && (
           <FormVantagem>
             <FormTitulo>Cadastrar Nova Vantagem</FormTitulo>
-            <form onSubmit={handleCriarVantagem}>
+            <form onSubmit={handleCriarVantagem} encType="multipart/form-data">
               <CampoTexto
                 label="Nome"
                 name="nome"
@@ -267,16 +291,6 @@ export default function VantagensPage() {
                 required
               />
               <CampoTexto
-                label="URL da Foto"
-                name="foto"
-                type="url"
-                value={novaVantagem.foto}
-                onChange={(e) =>
-                  setNovaVantagem({ ...novaVantagem, foto: e.target.value })
-                }
-                placeholder="https://exemplo.com/imagem.jpg"
-              />
-              <CampoTexto
                 label="Custo em Moedas"
                 name="custoMoedas"
                 type="number"
@@ -291,6 +305,14 @@ export default function VantagensPage() {
                 step="0.01"
                 required
               />
+              <label>Foto</label>
+              <FileUpload
+                label="Foto da Vantagem"
+                accept="image/*"
+                onChange={handleArquivoFoto}
+                preview={fotoArquivo}
+              />
+
               <Botao tipo="primario" style={{ marginTop: "1rem" }}>
                 Cadastrar Vantagem
               </Botao>

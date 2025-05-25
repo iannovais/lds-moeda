@@ -17,7 +17,7 @@ app.use(cors({
 }));
 
 app.use(bodyParser.json());
-
+app.use("/uploads", express.static("uploads"));
 app.use("/api/auth", authRoutes);
 app.use("/api/usuarios", usuarioRoutes);
 app.use("/api/alunos", alunoRoutes);
