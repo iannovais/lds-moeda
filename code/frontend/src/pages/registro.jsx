@@ -92,7 +92,7 @@ export default function RegistroPage() {
 
         <form onSubmit={handleSubmit}>
           <Grupo>
-            <label>Tipo de conta:</label>
+            <label>Tipo de Conta:</label>
             <select
               value={tipoUsuario}
               onChange={(e) => setTipoUsuario(e.target.value)}
@@ -110,7 +110,7 @@ export default function RegistroPage() {
           </Grupo>
 
           <CampoTexto
-            label="Nome completo"
+            label="Nome Completo"
             name="nome"
             value={dados.nome}
             onChange={handleChange}
@@ -156,7 +156,7 @@ export default function RegistroPage() {
               />
 
               <CampoTexto
-                label="Endereço completo"
+                label="Endereço Completo"
                 name="endereco"
                 value={dados.endereco}
                 onChange={handleChange}
@@ -183,7 +183,7 @@ export default function RegistroPage() {
               />
 
               <CampoTexto
-                label="Endereço completo"
+                label="Endereço Completo"
                 name="endereco"
                 value={dados.endereco}
                 onChange={handleChange}
@@ -201,7 +201,7 @@ export default function RegistroPage() {
         </form>
 
         <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-          Já tem uma conta? {' '}
+          Já tem uma Conta? {' '}
           <button
             onClick={() => navigate('/login')}
             style={{
