@@ -42,7 +42,7 @@ export default function LoginPage() {
     try {
       const { data } = await axios.post('http://localhost:3000/api/auth/login', credenciais)
       localStorage.setItem('token', data.token)
-      navigate('/perfil')
+      navigate('/home')
     } catch (error) {
       setErro(error.response?.data?.erro || 'Falha na autenticação')
     }

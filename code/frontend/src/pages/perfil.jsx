@@ -152,14 +152,6 @@ export default function PerfilPage() {
   const [sucesso, setSucesso] = useState("");
   const [tipoUsuario, setTipoUsuario] = useState("");
   const [idUsuario, setIdUsuario] = useState("");
-  const [vantagens, setVantagens] = useState([]);
-  const [novaVantagem, setNovaVantagem] = useState({
-    nome: "",
-    descricao: "",
-    foto: "",
-    custoMoedas: 0
-  });
-  const [erroVantagem, setErroVantagem] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -195,32 +187,6 @@ export default function PerfilPage() {
 
     carregarPerfil();
   }, [navigate]);
-
-  useEffect(() => {
-    const carregarVantagens = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
-
-        let endpoint = "/api/vantagens";
-        if (tipoUsuario === "empresa") {
-          endpoint = "/api/vantagens/minhas-vantagens";
-        }
-
-        const { data } = await axios.get(`http://localhost:3000${endpoint}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        
-        setVantagens(data);
-      } catch (error) {
-        console.error("Erro ao carregar vantagens:", error);
-      }
-    };
-
-    if (tipoUsuario) {
-      carregarVantagens();
-    }
-  }, [tipoUsuario]);
 
   const handleChange = (e) => {
     setDados({
@@ -291,64 +257,11 @@ export default function PerfilPage() {
     }
   };
 
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/login");
   };
-
-  const handleCriarVantagem = async (e) => {
-    e.preventDefault();
-    try {
-      const token = localStorage.getItem("token");
-      const { data } = await axios.post(
-        "http://localhost:3000/api/vantagens",
-        novaVantagem,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      
-      setVantagens([...vantagens, data]);
-      setNovaVantagem({ nome: "", descricao: "", foto: "", custoMoedas: 0 });
-      setErroVantagem("");
-    } catch (error) {
-      setErroVantagem(error.response?.data?.erro || "Erro ao criar vantagem");
-    }
-  };
-
-  const renderVantagens = () => (
-    <div>
-      <FormTitulo>
-        {tipoUsuario === "empresa" ? "Minhas Vantagens" : "Vantagens Disponíveis"}
-      </FormTitulo>
-      
-      {vantagens.length === 0 ? (
-        <p style={{ color: "#868e96", textAlign: "center" }}>Nenhuma vantagem encontrada</p>
-      ) : (
-        <VantagensGrid>
-          {vantagens.map((vantagem) => (
-            <VantagemCard key={vantagem.id}>
-              {vantagem.foto && (
-                <VantagemImagem 
-                  src={vantagem.foto} 
-                  alt={vantagem.nome}
-                  onError={(e) => {
-                    e.target.src = "https://via.placeholder.com/300x160?text=Sem+Imagem";
-                  }}
-                />
-              )}
-              <VantagemTitulo>{vantagem.nome}</VantagemTitulo>
-              <VantagemDescricao>{vantagem.descricao}</VantagemDescricao>
-              <VantagemPreco>{vantagem.custoMoedas} moedas</VantagemPreco>
-              {tipoUsuario === "empresa" && (
-                <VantagemData>
-                  Cadastrada em: {new Date(vantagem.data_cadastro).toLocaleDateString()}
-                </VantagemData>
-              )}
-            </VantagemCard>
-          ))}
-        </VantagensGrid>
-      )}
-    </div>
-  );
 
   return (
     <Container>
@@ -455,75 +368,8 @@ export default function PerfilPage() {
             >
               Excluir Conta
             </Botao>
-
-            <Botao
-              tipo="secundario"
-              style={{
-                width: "100%",
-                marginTop: "2rem",
-                backgroundColor: "#868e96",
-              }}
-              onClick={handleLogout}
-            >
-              Deslogar
-            </Botao>
           </div>
         </form>
-
-        <SectionVantagens>
-          {erroVantagem && <MensagemErro>{erroVantagem}</MensagemErro>}
-
-          {tipoUsuario === "empresa" && (
-            <FormVantagem>
-              <FormTitulo>Cadastrar Nova Vantagem</FormTitulo>
-              <form onSubmit={handleCriarVantagem}>
-                <CampoTexto
-                  label="Nome"
-                  name="nome"
-                  value={novaVantagem.nome}
-                  onChange={(e) => setNovaVantagem({...novaVantagem, nome: e.target.value})}
-                  required
-                />
-                <CampoTexto
-                  label="Descrição"
-                  name="descricao"
-                  value={novaVantagem.descricao}
-                  onChange={(e) => setNovaVantagem({...novaVantagem, descricao: e.target.value})}
-                  required
-                />
-                <CampoTexto
-                  label="URL da Foto"
-                  name="foto"
-                  type="url"
-                  value={novaVantagem.foto}
-                  onChange={(e) => setNovaVantagem({...novaVantagem, foto: e.target.value})}
-                  placeholder="https://exemplo.com/imagem.jpg"
-                />
-                <CampoTexto
-                  label="Custo em Moedas"
-                  name="custoMoedas"
-                  type="number"
-                  value={novaVantagem.custoMoedas}
-                  onChange={(e) => setNovaVantagem({
-                    ...novaVantagem, 
-                    custoMoedas: parseFloat(e.target.value)
-                  })}
-                  min="0"
-                  step="0.01"
-                  required
-                />
-                <Botao
-                  tipo="primario"
-                  style={{ marginTop: "1rem" }}
-                >
-                  Cadastrar Vantagem
-                </Botao>
-              </form>
-            </FormVantagem>
-          )}
-
-          {renderVantagens()}
-        </SectionVantagens>
       </CardForm>
     </Container>
   );
