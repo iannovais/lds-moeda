@@ -64,7 +64,6 @@ export default function PerfilPage() {
     rg: "",
     endereco: "",
     curso: "",
-    saldomoedas: 0,
     cnpj: "",
   });
 
@@ -135,7 +134,7 @@ export default function PerfilPage() {
               rg: dados.rg,
               endereco: dados.endereco,
               curso: dados.curso,
-              saldomoedas: dados.saldomoedas ?? 0,
+              saldomoedas: dados.saldomoedas,
             }
           : {
               cnpj: dados.cnpj,
@@ -248,7 +247,7 @@ export default function PerfilPage() {
               <div style={{ marginTop: "1rem", fontWeight: "bold" }}>
                 Saldo de Moedas:{" "}
                 <span style={{ color: "#2b8a3e" }}>
-                  {dados.saldomoedas ?? 0}
+                  {dados.saldoMoedas}
                 </span>
               </div>
             </>

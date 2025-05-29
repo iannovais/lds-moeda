@@ -1,5 +1,4 @@
 const VantagemDAO = require("../dao/vantagemDAO");
-const autenticacao = require("../middlewares/autenticacao");
 
 class VantagemController {
     async criar(req, res) {

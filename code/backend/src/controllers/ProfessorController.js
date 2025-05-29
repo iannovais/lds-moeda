@@ -90,10 +90,14 @@ class ProfessorController {
                 return res.status(404).json({ erro: "Aluno não encontrado" });
             }
 
+            if (!mensagem) {
+                return res.status(404).json({ erro: "Você não pode enviar sem uma mensagem" });
+            }
+
             const transacao = await TransacaoDAO.criar({
                 tipo: "envio_moedas",
                 valorMoedas: valor,
-                mensagem: mensagem || null, 
+                mensagem: mensagem, 
                 remetente_id: professorId,
                 destinatario_id: alunoId
             });

@@ -1,4 +1,4 @@
-import styled from "styled-components"
+import styled from "styled-components";
 import { useState } from "react";
 
 const CampoArquivoContainer = styled.div`
@@ -8,28 +8,35 @@ const CampoArquivoContainer = styled.div`
 const CampoArquivoLabel = styled.label`
   display: block;
   margin-bottom: 0.5rem;
-  color: #495057;
+  color: ${props => props.$error ? '#dc3545' : '#495057'};
   font-weight: 500;
   font-size: 0.875rem;
+
+  &:after {
+    content: ${props => props.required ? '" *"' : '""'};
+    color: #dc3545;
+  }
 `;
 
 const CampoArquivoCustom = styled.div`
   position: relative;
   display: flex;
   align-items: center;
-  border: 1px solid #ced4da;
+  border: 1px solid ${props => props.$error ? '#dc3545' : '#ced4da'};
   border-radius: 6px;
   padding: 0.5rem;
   background-color: #fff;
   transition: all 0.2s;
 
   &:hover {
-    border-color: #868e96;
+    border-color: ${props => props.$error ? '#dc3545' : '#868e96'};
   }
 
   &:focus-within {
-    border-color: #2b8a3e;
-    box-shadow: 0 0 0 0.2rem rgba(43, 138, 62, 0.25);
+    border-color: ${props => props.$error ? '#dc3545' : '#2b8a3e'};
+    box-shadow: ${props => props.$error 
+      ? '0 0 0 0.2rem rgba(220, 53, 69, 0.25)' 
+      : '0 0 0 0.2rem rgba(43, 138, 62, 0.25)'};
   }
 `;
 
@@ -47,14 +54,14 @@ const CampoArquivoTexto = styled.span`
   padding: 0.375rem 0.75rem;
   background-color: #f1f3f5;
   border-radius: 4px;
-  color: #495057;
+  color: ${props => props.$error ? '#dc3545' : '#495057'};
   margin-right: 0.75rem;
   font-size: 0.875rem;
 `;
 
 const CampoArquivoNome = styled.span`
   font-size: 0.875rem;
-  color: #868e96;
+  color: ${props => props.$error ? '#dc3545' : '#868e96'};
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -70,11 +77,20 @@ const PreviewImagem = styled.img`
   display: block;
 `;
 
-const FileUpload = ({ label, accept, onChange, preview }) => {
+const MensagemErro = styled.small`
+  display: block;
+  color: #dc3545;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+`;
+
+const FileUpload = ({ label, accept, onChange, preview, required, error }) => {
   const [fileName, setFileName] = useState("");
+  const [touched, setTouched] = useState(false);
 
   const handleChange = (e) => {
     const file = e.target.files[0];
+    setTouched(true);
     if (file) {
       setFileName(file.name);
     } else {
@@ -83,16 +99,25 @@ const FileUpload = ({ label, accept, onChange, preview }) => {
     onChange(e);
   };
 
+  const showError = error && (required && !fileName && touched);
+
   return (
     <CampoArquivoContainer>
-      <CampoArquivoLabel>{label}</CampoArquivoLabel>
-      <CampoArquivoCustom>
-        <CampoArquivoTexto>Selecionar arquivo</CampoArquivoTexto>
-        <CampoArquivoNome>
+      <CampoArquivoLabel $error={showError} required={required}>
+        {label}
+      </CampoArquivoLabel>
+      <CampoArquivoCustom $error={showError}>
+        <CampoArquivoTexto $error={showError}>Selecionar arquivo</CampoArquivoTexto>
+        <CampoArquivoNome $error={showError}>
           {fileName || "Nenhum arquivo selecionado"}
         </CampoArquivoNome>
-        <CampoArquivoInput accept={accept} onChange={handleChange} />
+        <CampoArquivoInput 
+          accept={accept} 
+          onChange={handleChange} 
+          required={required}
+        />
       </CampoArquivoCustom>
+      {showError && <MensagemErro>Este campo é obrigatório</MensagemErro>}
       {preview && (
         <PreviewImagem
           src={typeof preview === "string" ? preview : URL.createObjectURL(preview)}

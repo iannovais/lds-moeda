@@ -188,9 +188,7 @@ export default function VantagensPage() {
       formData.append("nome", novaVantagem.nome);
       formData.append("descricao", novaVantagem.descricao);
       formData.append("custoMoedas", novaVantagem.custoMoedas);
-      if (fotoArquivo) {
-        formData.append("foto", fotoArquivo);
-      }
+      formData.append("foto", fotoArquivo);
 
       const { data } = await axios.post(
         "http://localhost:3000/api/vantagens",
@@ -208,9 +206,6 @@ export default function VantagensPage() {
   };
 
   function obterUrlFoto(foto) {
-    if (!foto || foto.trim() === "") {
-      return "https://placehold.co/300x160?text=Sem+Imagem";
-    }
     if (foto.startsWith("http")) {
       return foto;
     }
@@ -301,7 +296,7 @@ export default function VantagensPage() {
                     custoMoedas: parseFloat(e.target.value),
                   })
                 }
-                min="0"
+                min="1"
                 step="0.01"
                 required
               />
@@ -311,6 +306,7 @@ export default function VantagensPage() {
                 accept="image/*"
                 onChange={handleArquivoFoto}
                 preview={fotoArquivo}
+                required 
               />
 
               <Botao tipo="primario" style={{ marginTop: "1rem" }}>
