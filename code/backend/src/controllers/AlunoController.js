@@ -71,6 +71,17 @@ class AlunoController {
             res.status(500).json({ erro: "Erro ao deletar aluno" });
         }
     }
+
+    async getExtrato(req, res) {
+        try {
+            const { id } = req.usuario;
+            const transacoes = await TransacaoDAO.listarPorDestinatario(id);
+            res.status(200).json(transacoes);
+        } catch (error) {
+            console.error("Erro ao buscar extrato:", error);
+            res.status(500).json({ erro: "Erro ao buscar extrato" });
+        }
+    }
 }
 
 module.exports = new AlunoController();
