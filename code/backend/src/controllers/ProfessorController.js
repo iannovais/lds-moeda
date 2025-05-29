@@ -62,6 +62,7 @@ class ProfessorController {
             await ProfessorDAO.deletar(id);
             res.status(204).end();
         } catch (error) {
+            console.log(error)
             res.status(500).json({ erro: "Erro ao deletar professor" });
         }
     }
@@ -71,9 +72,17 @@ class ProfessorController {
             const { id: professorId } = req.usuario;
             const { alunoId, valor, mensagem } = req.body;
 
+            if (valor === undefined || alunoId === undefined) {
+                return res.status(400).json({ erro: "Valor e alunoId são obrigatórios" });
+            }
+
             const professor = await ProfessorDAO.buscarPorID(professorId);
             if (professor.saldoMoedas < valor) {
                 return res.status(400).json({ erro: "Saldo insuficiente" });
+            }
+
+            if(valor <= 0) {
+                return res.status(400).json({ erro: "Você não pode enviar valor negativo ou zero!"})
             }
 
             const aluno = await AlunoDAO.buscarPorID(alunoId);
@@ -84,7 +93,7 @@ class ProfessorController {
             const transacao = await TransacaoDAO.criar({
                 tipo: "envio_moedas",
                 valorMoedas: valor,
-                mensagem: mensagem,
+                mensagem: mensagem || null, 
                 remetente_id: professorId,
                 destinatario_id: alunoId
             });
@@ -105,6 +114,7 @@ class ProfessorController {
     }
 
     async getExtrato(req, res) {
+        console.log("Usuário autenticado:", req.usuario);
         try {
             const { id } = req.usuario;
             const transacoes = await TransacaoDAO.listarPorUsuario(id);

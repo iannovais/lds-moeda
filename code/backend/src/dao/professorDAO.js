@@ -26,15 +26,30 @@ class ProfessorDAO {
     }
 
     async atualizar(id, dadosAtualizados) {
-        const { cpf, departamento, saldoMoedas, id_instituicao } = dadosAtualizados;
+        const camposValidos = {};
+        for (const [chave, valor] of Object.entries(dadosAtualizados)) {
+            if (valor !== undefined) {
+                camposValidos[chave] = valor;
+            }
+        }
 
-        await pool.execute(
-            "UPDATE Professor SET cpf = ?, departamento = ?, saldoMoedas = ?, id_instituicao = ? WHERE id = ?",
-            [cpf, departamento, saldoMoedas, id_instituicao, id]
-        );
+        if (Object.keys(camposValidos).length === 0) {
+            return this.buscarPorID(id);
+        }
 
-        const [rows] = await pool.execute("SELECT * FROM Professor WHERE id = ?", [id]);
-        return rows[0] ? new Professor(rows[0]) : null;
+        const campos = [];
+        const valores = [];
+
+        for (const [chave, valor] of Object.entries(camposValidos)) {
+            campos.push(`${chave} = ?`);
+            valores.push(valor);
+        }
+        valores.push(id);
+
+        const sql = `UPDATE Professor SET ${campos.join(", ")} WHERE id = ?`;
+        await pool.execute(sql, valores);
+
+        return this.buscarPorID(id);
     }
 
     async deletar(id) {

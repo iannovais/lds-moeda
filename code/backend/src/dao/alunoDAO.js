@@ -27,15 +27,30 @@ class AlunoDAO {
     }
 
     async atualizar(id, dadosAtualizados) {
-        const { cpf, rg, endereco, curso, saldomoedas } = dadosAtualizados;
+        const camposValidos = {};
+        for (const [chave, valor] of Object.entries(dadosAtualizados)) {
+            if (valor !== undefined) {
+                camposValidos[chave] = valor;
+            }
+        }
 
-        await pool.execute(
-            "UPDATE Aluno SET cpf = ?, rg = ?, endereco = ?, curso = ?, saldoMoedas = ? WHERE id = ?",
-            [cpf, rg, endereco, curso, saldomoedas, id]
-        );
+        if (Object.keys(camposValidos).length === 0) {
+            return this.buscarPorID(id);
+        }
 
-        const [rows] = await pool.execute("SELECT * FROM Aluno WHERE id = ?", [id]);
-        return rows[0] ? new Aluno(rows[0]) : null;
+        const campos = [];
+        const valores = [];
+
+        for (const [chave, valor] of Object.entries(camposValidos)) {
+            campos.push(`${chave} = ?`);
+            valores.push(valor);
+        }
+        valores.push(id);
+
+        const sql = `UPDATE Aluno SET ${campos.join(", ")} WHERE id = ?`;
+        await pool.execute(sql, valores);
+
+        return this.buscarPorID(id);
     }
 
     async deletar(id) {

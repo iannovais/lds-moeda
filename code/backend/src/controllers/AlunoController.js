@@ -1,4 +1,5 @@
 const AlunoDAO = require("../dao/alunoDAO");
+const TransacaoDAO = require("../dao/transacaoDAO");
 
 const { cpf: cpfValidator } = require("cpf-cnpj-validator");
 
