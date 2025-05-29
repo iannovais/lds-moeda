@@ -6,6 +6,7 @@ const usuarioRoutes = require("./routes/usuarioRoutes");
 const alunoRoutes = require("./routes/alunoRoutes");
 const empresaRoutes = require("./routes/empresaRoutes");
 const vantagemRoutes = require("./routes/vantagemRoutes");
+const professorRoutes = require("./routes/professorRoutes");
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use("/api/usuarios", usuarioRoutes);
 app.use("/api/alunos", alunoRoutes);
 app.use("/api/empresas", empresaRoutes);
 app.use("/api/vantagens", vantagemRoutes);
+app.use("/api/professor", professorRoutes);
 
 const PORT = 3000;
 app.listen(PORT, () => console.log(`Servidor rodando online e roteando 😎`));
