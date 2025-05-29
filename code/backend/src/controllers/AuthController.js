@@ -4,13 +4,14 @@ const jwt = require("jsonwebtoken");
 const UsuarioDAO = require("../dao/UsuarioDAO");
 const AlunoDAO = require("../dao/alunoDAO");
 const EmpresaDAO = require("../dao/EmpresaDAO");
+const ProfessorDAO = require("../dao/professorDAO");
 
 const { JWT_SECRET } = require("../config/config");
 const { cpf: cpfValidator, cnpj: cnpjValidator } = require("cpf-cnpj-validator");
 
 class AuthController {
   async registrar(req, res) {
-    const { tipo, nome, email, senha, cpf, rg, cnpj, ...dadosRestantes } = req.body;
+    const { tipo, nome, email, senha, cpf, rg, cnpj, departamento, id_instituicao, ...dadosRestantes } = req.body;
 
     try {
       const usuarioExistente = await UsuarioDAO.buscarPorEmail(email);
@@ -29,6 +30,16 @@ class AuthController {
         if (!cnpj || !cnpjValidator.isValid(cnpj)) {
           return res.status(400).json({ erro: "CNPJ inválido." });
         }
+      } else if (tipo === "professor") {
+        if (!cpf || !cpfValidator.isValid(cpf)) {
+          return res.status(400).json({ erro: "CPF inválido." });
+        }
+        if (!departamento) {
+          return res.status(400).json({ erro: "Departamento é obrigatório para professores." });
+        }
+        if (!id_instituicao) {
+          return res.status(400).json({ erro: "Instituição de ensino é obrigatória para professores." });
+        }
       } else {
         return res.status(400).json({ erro: "Tipo de usuário inválido." });
       }
@@ -45,8 +56,14 @@ class AuthController {
       let resultado;
       if (tipo === "aluno") {
         resultado = await AlunoDAO.criar(novoUsuario.id, { cpf: cpfValidator.strip(cpf), rg, ...dadosRestantes });
-      } else {
+      } else if (tipo === "empresa") {
         resultado = await EmpresaDAO.criar(novoUsuario.id, { cnpj: cnpjValidator.strip(cnpj), ...dadosRestantes });
+      } else if (tipo === "professor") {
+        resultado = await ProfessorDAO.criar(novoUsuario.id, {
+          cpf: cpfValidator.strip(cpf),
+          departamento,
+          id_instituicao
+        });
       }
 
       return res.status(201).json({
@@ -59,6 +76,7 @@ class AuthController {
       return res.status(500).json({ erro: "Erro interno ao registrar usuário." });
     }
   }
+
 
   async login(req, res) {
     const { email, senha } = req.body;

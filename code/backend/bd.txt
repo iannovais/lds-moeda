@@ -1,0 +1,71 @@
+CREATE DATABASE escola_moedas;
+USE escola_moedas;
+
+CREATE TABLE InstituicaoEnsino (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nome VARCHAR(100) NOT NULL,
+  cnpj VARCHAR(18) UNIQUE NOT NULL,
+  endereco TEXT NOT NULL
+);
+
+CREATE TABLE Usuario (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nome VARCHAR(100) NOT NULL,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  senha VARCHAR(255) NOT NULL,
+  dataCadastro DATETIME DEFAULT CURRENT_TIMESTAMP,
+  tipo ENUM('aluno', 'empresa', 'professor') NOT NULL
+);
+
+CREATE TABLE Aluno (
+  id INT PRIMARY KEY,
+  cpf VARCHAR(14) UNIQUE NOT NULL,
+  rg VARCHAR(12) NOT NULL,
+  endereco TEXT NOT NULL,
+  curso VARCHAR(50) NOT NULL,
+  saldoMoedas INT DEFAULT 0,
+  FOREIGN KEY (id) REFERENCES Usuario(id) ON DELETE CASCADE
+);
+
+CREATE TABLE Empresa (
+  id INT PRIMARY KEY,
+  cnpj VARCHAR(18) UNIQUE NOT NULL,
+  endereco TEXT NOT NULL,
+  FOREIGN KEY (id) REFERENCES Usuario(id) ON DELETE CASCADE
+);
+
+CREATE TABLE Professor (
+  id INT PRIMARY KEY,
+  cpf VARCHAR(14) UNIQUE NOT NULL,
+  departamento VARCHAR(50) NOT NULL,
+  saldoMoedas INT DEFAULT 0,
+  id_instituicao INT NOT NULL,
+  FOREIGN KEY (id) REFERENCES Usuario(id) ON DELETE CASCADE,
+  FOREIGN KEY (id_instituicao) REFERENCES InstituicaoEnsino(id)
+);
+
+CREATE TABLE vantagem (
+  id int NOT NULL AUTO_INCREMENT,
+  nome varchar(100) NOT NULL,
+  descricao text,
+  foto varchar(255) DEFAULT NULL,
+  custoMoedas decimal(10,2) NOT NULL,
+  empresa_id int NOT NULL,
+  data_cadastro datetime DEFAULT CURRENT_TIMESTAMP,
+  ativo tinyint(1) DEFAULT '1',
+  PRIMARY KEY (id),
+  KEY empresa_id (empresa_id),
+  CONSTRAINT vantagem_ibfk_1 FOREIGN KEY (empresa_id) REFERENCES empresa (id) ON DELETE CASCADE
+);
+
+CREATE TABLE Transacao (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  data DATETIME DEFAULT CURRENT_TIMESTAMP,
+  tipo ENUM('envio_moedas') NOT NULL,
+  valorMoedas INT NOT NULL,
+  mensagem TEXT,
+  remetente_id INT NOT NULL,  
+  destinatario_id INT NOT NULL,
+  FOREIGN KEY (remetente_id) REFERENCES Professor(id),
+  FOREIGN KEY (destinatario_id) REFERENCES Aluno(id)
+);
