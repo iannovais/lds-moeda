@@ -108,8 +108,19 @@ export default function HomePage() {
           )}
 
           {tipoUsuario === "aluno" && (
-            <Botao onClick={() => navigate("/vantagens")}>
-              Ver Vantagens
+            <>
+              <Botao onClick={() => navigate("/vantagens")}>
+                Ver Vantagens
+              </Botao>
+              <Botao onClick={() => navigate("/extrato")}>
+                Ver Extrato
+              </Botao>
+            </>
+          )}
+
+          {tipoUsuario === "professor" && (
+            <Botao onClick={() => navigate("/extrato")}>
+              Envio de Moedas
             </Botao>
           )}
 

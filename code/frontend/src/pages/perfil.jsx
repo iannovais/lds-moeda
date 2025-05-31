@@ -65,6 +65,9 @@ export default function PerfilPage() {
     endereco: "",
     curso: "",
     cnpj: "",
+    departamento: "",
+    id_instituicao: "",
+    saldoMoedas: 0
   });
 
   const [erro, setErro] = useState("");
@@ -91,13 +94,27 @@ export default function PerfilPage() {
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        const endpoint = decoded.tipo === "aluno" ? "alunos" : "empresas";
+        let endpoint;
+
+        if (decoded.tipo === "aluno") {
+          endpoint = "alunos";
+        } else if (decoded.tipo === "empresa") {
+          endpoint = "empresas";
+        } else if (decoded.tipo === "professor") {
+          endpoint = "professor";
+        } else {
+          throw new Error("Tipo de usuário desconhecido");
+        }
+
         const { data: detalhes } = await axios.get(
           `http://localhost:3000/api/${endpoint}/${decoded.id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        setDados({ ...usuario, ...detalhes });
+        setDados({
+          ...usuario,
+          ...detalhes
+        });
       } catch (error) {
         setErro("Erro ao carregar dados do usuário");
         console.error("Erro ao carregar perfil:", error);
@@ -125,21 +142,31 @@ export default function PerfilPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      const endpoint = tipoUsuario === "aluno" ? "alunos" : "empresas";
+      let endpoint;
+      let dadosEspecificos = {};
 
-      const dadosEspecificos =
-        tipoUsuario === "aluno"
-          ? {
-              cpf: dados.cpf,
-              rg: dados.rg,
-              endereco: dados.endereco,
-              curso: dados.curso,
-              saldomoedas: dados.saldomoedas,
-            }
-          : {
-              cnpj: dados.cnpj,
-              endereco: dados.endereco,
-            };
+      if (tipoUsuario === "aluno") {
+        endpoint = "alunos";
+        dadosEspecificos = {
+          cpf: dados.cpf,
+          rg: dados.rg,
+          endereco: dados.endereco,
+          curso: dados.curso,
+        };
+      } else if (tipoUsuario === "empresa") {
+        endpoint = "empresas";
+        dadosEspecificos = {
+          cnpj: dados.cnpj,
+          endereco: dados.endereco,
+        };
+      } else if (tipoUsuario === "professor") {
+        endpoint = "professor";
+        dadosEspecificos = {
+          cpf: dados.cpf,
+          departamento: dados.departamento,
+          id_instituicao: dados.id_instituicao,
+        };
+      }
 
       await axios.put(
         `http://localhost:3000/api/${endpoint}/${idUsuario}`,
@@ -174,12 +201,6 @@ export default function PerfilPage() {
       console.error("Erro ao excluir conta:", error.response?.data || error.message);
       setErro("Erro ao excluir conta");
     }
-  };
-
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
   };
 
   return (
@@ -251,6 +272,38 @@ export default function PerfilPage() {
                 </span>
               </div>
             </>
+          ) : tipoUsuario === "professor" ? (
+            <>
+              <CampoTexto
+                label="CPF"
+                name="cpf"
+                value={dados.cpf}
+                onChange={handleChange}
+                mask="999.999.999-99"
+                required
+              />
+              <CampoTexto
+                label="Departamento"
+                name="departamento"
+                value={dados.departamento}
+                onChange={handleChange}
+                required
+              />
+              <CampoTexto
+                label="ID da Instituição"
+                name="id_instituicao"
+                value={dados.id_instituicao}
+                onChange={handleChange}
+                required
+                type="number"
+              />
+              <div style={{ marginTop: "1rem", fontWeight: "bold" }}>
+                Saldo de Moedas:{" "}
+                <span style={{ color: "#2b8a3e" }}>
+                  {dados.saldoMoedas}
+                </span>
+              </div>
+            </>
           ) : (
             <>
               <CampoTexto
@@ -276,17 +329,19 @@ export default function PerfilPage() {
               Salvar Alterações
             </Botao>
 
-            <Botao
-              tipo="perigo"
-              style={{
-                width: "100%",
-                marginTop: "2rem",
-                backgroundColor: "#c92a2a",
-              }}
-              onClick={handleExcluirConta}
-            >
-              Excluir Conta
-            </Botao>
+            {tipoUsuario === "empresa" && (
+              <Botao
+                tipo="perigo"
+                style={{
+                  width: "100%",
+                  marginTop: "2rem",
+                  backgroundColor: "#c92a2a",
+                }}
+                onClick={handleExcluirConta}
+              >
+                Excluir Conta
+              </Botao>
+            )}
           </div>
         </form>
       </CardForm>

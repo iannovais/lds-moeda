@@ -43,7 +43,9 @@ export default function RegistroPage() {
     rg: '',
     endereco: '',
     curso: '',
-    cnpj: ''
+    cnpj: '',
+    departamento: '',
+    id_instituicao: ''
   })
   const [erro, setErro] = useState('')
   const navigate = useNavigate()
@@ -63,9 +65,13 @@ export default function RegistroPage() {
       payload.rg = dados.rg
       payload.endereco = dados.endereco
       payload.curso = dados.curso
-    } else {
+    } else if (tipoUsuario === 'empresa') {
       payload.cnpj = dados.cnpj
       payload.endereco = dados.endereco
+    } else if (tipoUsuario === 'professor') {
+      payload.cpf = dados.cpf
+      payload.departamento = dados.departamento
+      payload.id_instituicao = dados.id_instituicao
     }
 
     try {
@@ -105,6 +111,7 @@ export default function RegistroPage() {
               }}
             >
               <option value="aluno">Aluno</option>
+              <option value="professor">Professor</option>
               <option value="empresa">Empresa</option>
             </select>
           </Grupo>
@@ -169,6 +176,35 @@ export default function RegistroPage() {
                 value={dados.curso}
                 onChange={handleChange}
                 required
+              />
+            </>
+          ) : tipoUsuario === 'professor' ? (
+            <>
+              <CampoTexto
+                label="CPF"
+                name="cpf"
+                value={dados.cpf}
+                onChange={handleChange}
+                required
+                mask="999.999.999-99"
+              />
+
+              <CampoTexto
+                label="Departamento"
+                name="departamento"
+                value={dados.departamento}
+                onChange={handleChange}
+                required
+              />
+
+              <CampoTexto
+                label="ID da Instituição"
+                name="id_instituicao"
+                value={dados.id_instituicao}
+                onChange={handleChange}
+                required
+                type="number"
+                placeholder="Ex: 1"
               />
             </>
           ) : (

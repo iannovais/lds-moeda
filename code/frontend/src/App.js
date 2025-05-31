@@ -4,6 +4,7 @@ import Registro from './pages/registro'
 import Perfil from './pages/perfil'
 import HomePage from './pages/home'
 import VantagensPage from './pages/vantagens'
+import Extrato from "./pages/extrato";
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
         <Route path="/home" element={<HomePage />} />
         <Route path="/perfil" element={<Perfil />} />
         <Route path="/vantagens" element={<VantagensPage />} />
+        <Route path="/extrato" element={<Extrato />} />
       </Routes>
     </Router>
   )
