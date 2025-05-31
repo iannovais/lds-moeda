@@ -120,7 +120,6 @@ class ProfessorController {
     }
 
     async getExtrato(req, res) {
-        console.log("Usuário autenticado:", req.usuario);
         try {
             const { id } = req.usuario;
             const transacoes = await TransacaoDAO.listarPorUsuario(id);
