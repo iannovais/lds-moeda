@@ -11,11 +11,6 @@ const CampoArquivoLabel = styled.label`
   color: ${props => props.$error ? '#dc3545' : '#495057'};
   font-weight: 500;
   font-size: 0.875rem;
-
-  &:after {
-    content: ${props => props.required ? '" *"' : '""'};
-    color: #dc3545;
-  }
 `;
 
 const CampoArquivoCustom = styled.div`
