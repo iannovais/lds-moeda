@@ -3,6 +3,7 @@ const TransacaoDAO = require("../dao/transacaoDAO");
 const AlunoDAO = require("../dao/alunoDAO");
 const InstituicaoEnsinoDAO = require("../dao/instituicaoEnsinoDAO");
 const InstituicaoEnsino = require("../models/instituicaoEnsino");
+const notificacoes = require('../middlewares/notificacoes');
 
 const { cpf: cpfValidator } = require("cpf-cnpj-validator");
 
@@ -74,7 +75,7 @@ class ProfessorController {
             const { id: professorId } = req.usuario;
             const { alunoId, valor, mensagem } = req.body;
 
-            if (valor === undefined || alunoId === undefined) {
+            if (!valor || !alunoId) {
                 return res.status(400).json({ erro: "Valor e alunoId são obrigatórios" });
             }
 
@@ -110,6 +111,13 @@ class ProfessorController {
 
             await AlunoDAO.atualizar(alunoId, {
                 saldoMoedas: aluno.saldoMoedas + valor
+            });
+
+            await notificacoes.enviar('moedas_recebidas', aluno.email, {
+                alunoNome: aluno.nome,
+                remetenteNome: professor.nome,
+                valor: valor,
+                mensagem: mensagem
             });
 
             res.status(201).json(transacao);
