@@ -21,7 +21,6 @@ class VantagemController {
         }
     }
 
-
     async listarTodasAtivas(req, res) {
         try {
             const vantagens = await VantagemDAO.listarTodasAtivas();
