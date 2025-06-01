@@ -1,0 +1,142 @@
+@startuml
+
+actor "Professor" as professor
+actor "Aluno" as aluno
+participant "professorRoutes" as prof_rota
+participant "alunoRoutes" as aluno_rota
+participant "ProfessorController" as prof_controller
+participant "AlunoController" as aluno_controller
+participant "ProfessorDAO" as prof_dao
+participant "AlunoDAO" as aluno_dao
+participant "TransacaoDAO" as transacao_dao
+participant "Notificacoes" as notificacoes
+database "Banco de Dados" as bd
+
+professor -> prof_rota : 1. POST /professores/enviar-moedas
+activate professor
+activate prof_rota
+
+prof_rota -> prof_controller : 1.1. enviarMoedas(req,res)
+activate prof_controller
+
+alt !valor || !alunoId
+    prof_controller --> prof_rota
+end
+
+prof_controller -> prof_dao : 1.1.1. buscarPorID(professorId)
+activate prof_dao
+    prof_dao -> bd : 1.1.1.1. SELECT * FROM Professor WHERE id = ?
+    activate bd
+    bd --> prof_dao
+    deactivate bd
+prof_dao --> prof_controller
+deactivate prof_dao
+
+alt professor.saldoMoedas < valor
+    prof_controller --> prof_rota
+end
+
+alt valor <= 0
+    prof_controller --> prof_rota
+end
+
+prof_controller -> aluno_dao : 1.1.2. buscarPorID(alunoId)
+activate aluno_dao
+    aluno_dao -> bd : 1.1.2.1. SELECT * FROM Aluno WHERE id = ?
+    activate bd
+    bd --> aluno_dao
+    deactivate bd
+aluno_dao --> prof_controller
+deactivate aluno_dao
+
+alt !aluno
+    prof_controller --> prof_rota
+end
+
+alt !mensagem
+    prof_controller --> prof_rota
+end
+
+prof_controller -> transacao_dao : 1.1.3. criar(transacaoData)
+activate transacao_dao
+    transacao_dao -> bd : 1.1.3.1. INSERT INTO Transacao ...
+    activate bd
+    bd --> transacao_dao
+    deactivate bd
+transacao_dao --> prof_controller
+deactivate transacao_dao
+
+prof_controller -> prof_dao : 1.1.4. atualizar(professorId, {saldoMoedas})
+activate prof_dao
+    prof_dao -> bd : 1.1.4.1. UPDATE Professor SET saldoMoedas = ? WHERE id = ?
+    activate bd
+    bd --> prof_dao
+    deactivate bd
+prof_dao --> prof_controller
+deactivate prof_dao
+
+prof_controller -> aluno_dao : 1.1.5. atualizar(alunoId, {saldoMoedas})
+activate aluno_dao
+    aluno_dao -> bd : 1.1.5.1. UPDATE Aluno SET saldoMoedas = ? WHERE id = ?
+    activate bd
+    bd --> aluno_dao
+    deactivate bd
+aluno_dao --> prof_controller
+deactivate aluno_dao
+
+prof_controller -> notificacoes : 1.1.6. enviar('moedas_recebidas', aluno.email, dados)
+activate notificacoes
+    notificacoes -> notificacoes : 1.1.6.3. sendMail()
+notificacoes --> prof_controller
+deactivate notificacoes
+
+prof_controller --> prof_rota
+deactivate prof_controller
+
+prof_rota --> professor
+deactivate prof_rota
+deactivate professor
+
+professor -> prof_rota : 2. GET /professores/extrato
+activate professor
+activate prof_rota
+
+prof_rota -> prof_controller : 2.1. getExtrato(req,res)
+activate prof_controller
+    prof_controller -> transacao_dao : 2.1.1. listarPorUsuario(usuario_id)
+    activate transacao_dao
+        transacao_dao -> bd : 2.1.1.1. SELECT * FROM Transacao WHERE remetente_id = ? OR destinatario_id = ?
+        activate bd
+        bd --> transacao_dao
+        deactivate bd
+    transacao_dao --> prof_controller
+    deactivate transacao_dao
+prof_controller --> prof_rota
+deactivate prof_controller
+
+prof_rota --> professor
+deactivate prof_rota
+deactivate professor
+
+aluno -> aluno_rota : 3. GET /alunos/extrato
+activate aluno
+activate aluno_rota
+
+aluno_rota -> aluno_controller : 3.1. getExtrato(req,res)
+activate aluno_controller
+    aluno_controller -> transacao_dao : 3.1.1. listarPorDestinatario(usuario_id)
+    activate transacao_dao
+        transacao_dao -> bd : 3.1.1.1. SELECT * FROM Transacao WHERE destinatario_id = ?
+        activate bd
+        bd --> transacao_dao
+        deactivate bd
+    transacao_dao --> aluno_controller
+    deactivate transacao_dao
+aluno_controller --> aluno_rota
+deactivate aluno_controller
+
+aluno_rota --> aluno
+deactivate aluno_rota
+deactivate aluno
+
+@enduml
