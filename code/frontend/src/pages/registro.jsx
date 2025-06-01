@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import styled from 'styled-components'
@@ -47,8 +47,26 @@ export default function RegistroPage() {
     departamento: '',
     id_instituicao: ''
   })
+  const [instituicoes, setInstituicoes] = useState([])
+  const [loadingInstituicoes, setLoadingInstituicoes] = useState(false)
   const [erro, setErro] = useState('')
   const navigate = useNavigate()
+
+  // Pega as instituições da API só se o tipo for professor
+  useEffect(() => {
+    if (tipoUsuario === 'professor') {
+      setLoadingInstituicoes(true)
+      axios.get('http://localhost:3000/api/instituicoes')
+        .then(res => {
+          setInstituicoes(res.data)
+          setLoadingInstituicoes(false)
+        })
+        .catch(() => {
+          setErro('Erro ao carregar instituições')
+          setLoadingInstituicoes(false)
+        })
+    }
+  }, [tipoUsuario])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -197,15 +215,33 @@ export default function RegistroPage() {
                 required
               />
 
-              <CampoTexto
-                label="ID da Instituição"
-                name="id_instituicao"
-                value={dados.id_instituicao}
-                onChange={handleChange}
-                required
-                type="number"
-                placeholder="Ex: 1"
-              />
+              <Grupo>
+                <label>Instituição de Ensino:</label>
+                {loadingInstituicoes ? (
+                  <p>Carregando instituições...</p>
+                ) : (
+                  <select
+                    name="id_instituicao"
+                    value={dados.id_instituicao}
+                    onChange={handleChange}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem',
+                      borderRadius: '6px',
+                      border: '1px solid #ced4da',
+                      fontSize: '1rem'
+                    }}
+                  >
+                    <option value="">-- Selecione --</option>
+                    {instituicoes.map((inst) => (
+                      <option key={inst.id} value={inst.id}>
+                        {inst.nome}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </Grupo>
             </>
           ) : (
             <>
@@ -237,7 +273,7 @@ export default function RegistroPage() {
         </form>
 
         <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-          Já tem uma Conta? {' '}
+          Já tem uma Conta?{' '}
           <button
             onClick={() => navigate('/login')}
             style={{

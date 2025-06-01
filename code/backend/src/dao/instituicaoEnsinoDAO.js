@@ -9,6 +9,13 @@ class InstituicaoEnsinoDAO {
         );
         return rows[0] ? new InstituicaoEnsino(rows[0]) : null;
     }
+
+    async buscarTodas() {
+        const [rows] = await pool.execute(
+            "SELECT id, nome FROM instituicaoensino"
+        );
+        return rows.map(row => new InstituicaoEnsino(row));
+    }
 }
 
 module.exports = new InstituicaoEnsinoDAO();

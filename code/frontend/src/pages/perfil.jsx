@@ -56,6 +56,10 @@ const MensagemErro = styled(Mensagem)`
   color: #721c24;
 `;
 
+const Grupo = styled.div`
+  margin-bottom: 1.5rem;
+`;
+
 export default function PerfilPage() {
   const [dados, setDados] = useState({
     nome: "",
@@ -70,11 +74,35 @@ export default function PerfilPage() {
     saldoMoedas: 0
   });
 
+  const [instituicoes, setInstituicoes] = useState([]);
+  const [loadingInstituicoes, setLoadingInstituicoes] = useState(false);
   const [erro, setErro] = useState("");
   const [sucesso, setSucesso] = useState("");
   const [tipoUsuario, setTipoUsuario] = useState("");
   const [idUsuario, setIdUsuario] = useState("");
   const navigate = useNavigate();
+
+  // Carrega instituições quando o tipo de usuário for professor
+  useEffect(() => {
+    if (tipoUsuario === "professor") {
+      carregarInstituicoes();
+    }
+  }, [tipoUsuario]);
+
+  const carregarInstituicoes = async () => {
+    setLoadingInstituicoes(true);
+    try {
+      const token = localStorage.getItem("token");
+      const { data } = await axios.get('http://localhost:3000/api/instituicoes', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setInstituicoes(data);
+    } catch (error) {
+      setErro('Erro ao carregar instituições');
+    } finally {
+      setLoadingInstituicoes(false);
+    }
+  };
 
   useEffect(() => {
     const carregarPerfil = async () => {
@@ -289,14 +317,35 @@ export default function PerfilPage() {
                 onChange={handleChange}
                 required
               />
-              <CampoTexto
-                label="ID da Instituição"
-                name="id_instituicao"
-                value={dados.id_instituicao}
-                onChange={handleChange}
-                required
-                type="number"
-              />
+              
+              <Grupo>
+                <label>Instituição de Ensino:</label>
+                {loadingInstituicoes ? (
+                  <p>Carregando instituições...</p>
+                ) : (
+                  <select
+                    name="id_instituicao"
+                    value={dados.id_instituicao}
+                    onChange={handleChange}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem',
+                      borderRadius: '6px',
+                      border: '1px solid #ced4da',
+                      fontSize: '1rem'
+                    }}
+                  >
+                    <option value="">-- Selecione --</option>
+                    {instituicoes.map((inst) => (
+                      <option key={inst.id} value={inst.id}>
+                        {inst.nome}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </Grupo>
+
               <div style={{ marginTop: "1rem", fontWeight: "bold" }}>
                 Saldo de Moedas:{" "}
                 <span style={{ color: "#2b8a3e" }}>

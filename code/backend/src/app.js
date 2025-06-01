@@ -8,6 +8,8 @@ const empresaRoutes = require("./routes/empresaRoutes");
 const vantagemRoutes = require("./routes/vantagemRoutes");
 const professorRoutes = require("./routes/professorRoutes");
 const ProfessorController = require('./controllers/ProfessorController');
+const instituicaoEnsinoRoutes = require('./routes/instituicaoEnsinoRoutes');
+
 const cron = require('node-cron');
 
 const app = express();
@@ -27,6 +29,7 @@ app.use("/api/alunos", alunoRoutes);
 app.use("/api/empresas", empresaRoutes);
 app.use("/api/vantagens", vantagemRoutes);
 app.use("/api/professor", professorRoutes);
+app.use('/api/instituicoes', instituicaoEnsinoRoutes);
 
 cron.schedule('0 0 1 * *', async () => {
     console.log('Iniciando envio mensal de moedas...');
