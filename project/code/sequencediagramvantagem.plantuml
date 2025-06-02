@@ -8,6 +8,8 @@ participant "VantagemDAO" as dao
 participant "Vantagem Model" as model
 database "Banco de Dados" as bd
 
+ref over empresa, aluno : Realizar login
+
 empresa -> rota : 1. POST /vantagens
 activate empresa 
 activate rota 

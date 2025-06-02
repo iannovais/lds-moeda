@@ -12,6 +12,8 @@ participant "TransacaoDAO" as transacao_dao
 participant "Notificacoes" as notificacoes
 database "Banco de Dados" as bd
 
+ref over professor, aluno : Realizar login
+
 professor -> prof_rota : 1. POST /professores/enviar-moedas
 activate professor
 activate prof_rota
