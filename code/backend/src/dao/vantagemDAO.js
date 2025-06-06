@@ -34,6 +34,14 @@ class VantagemDAO {
         return this.buscarPorID(id);
     }
 
+    async desativar(id) {
+        await pool.execute(
+            "UPDATE vantagem SET ativo = FALSE WHERE id = ?",
+            [id]
+        );
+        return this.buscarPorID(id);
+    }
+
     async deletar(id) {
         await pool.execute("DELETE FROM vantagem WHERE id = ?", [id]);
     }

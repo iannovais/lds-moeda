@@ -61,7 +61,7 @@ CREATE TABLE vantagem (
 CREATE TABLE Transacao (
   id INT AUTO_INCREMENT PRIMARY KEY,
   data DATETIME DEFAULT CURRENT_TIMESTAMP,
-  tipo ENUM('envio_moedas', 'recarga_instituicao') NOT NULL,
+  tipo ENUM('envio_moedas', 'recarga_instituicao', 'resgate_vantagem') NOT NULL,
   valorMoedas INT NOT NULL,
   mensagem TEXT,
   remetente_id INT NULL,  

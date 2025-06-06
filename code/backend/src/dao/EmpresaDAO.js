@@ -16,7 +16,7 @@ class EmpresaDAO {
     }
 
     async buscarPorID(id) {
-        const [rows] = await pool.execute("SELECT * FROM Empresa WHERE id = ?", [id]);
+        const [rows] = await pool.execute("SELECT * FROM Usuario u INNER JOIN Empresa e ON u.id = e.id WHERE u.id = ?", [id]);
         return rows[0] ? new Empresa(rows[0]) : null;
     }
 
