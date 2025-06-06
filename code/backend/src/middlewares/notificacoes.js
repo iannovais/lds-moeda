@@ -181,8 +181,6 @@ module.exports = {
   enviar: async (tipo, destinatario, dados) => {
 
     try {
-      console.log(JSON.stringify(dados, null, 2));
-      
       const template = templates[tipo](dados);
 
       await transporter.sendMail({

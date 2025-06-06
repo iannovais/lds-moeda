@@ -32,10 +32,8 @@ app.use("/api/professor", professorRoutes);
 app.use('/api/instituicoes', instituicaoEnsinoRoutes);
 
 cron.schedule('0 0 1 * *', async () => {
-    console.log('Iniciando envio mensal de moedas...');
     try {
         await ProfessorController.enviarMoedasMensais();
-        console.log('Envio mensal de moedas concluído com sucesso!');
     } catch (error) {
         console.error('Falha no envio mensal de moedas:', error);
     }

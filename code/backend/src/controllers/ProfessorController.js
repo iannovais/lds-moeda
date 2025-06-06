@@ -65,7 +65,6 @@ class ProfessorController {
             await ProfessorDAO.deletar(id);
             res.status(204).end();
         } catch (error) {
-            console.log(error)
             res.status(500).json({ erro: "Erro ao deletar professor" });
         }
     }
@@ -163,8 +162,6 @@ class ProfessorController {
                     destinatario_id: professor.id
                 });
             }
-
-            console.log(`Recarga mensal concluída para ${professores.length} professores`);
         } catch (error) {
             console.error("Erro no envio mensal de moedas:", error);
             throw error;
