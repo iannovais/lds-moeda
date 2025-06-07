@@ -1,0 +1,32 @@
+@startuml
+
+actor "Professor" as professor
+participant "professorRoutes" as prof_rota
+participant "ProfessorController" as prof_controller
+participant "TransacaoDAO" as transacao_dao
+database "Banco de Dados" as bd
+
+ref over professor : Realizar login
+
+professor -> prof_rota : 1. GET /professores/extrato
+activate professor
+activate prof_rota
+
+prof_rota -> prof_controller : 1.1. getExtrato(req,res)
+activate prof_controller
+    prof_controller -> transacao_dao : 1.1.1. listarPorUsuario(usuario_id)
+    activate transacao_dao
+        transacao_dao -> bd : 1.1.1.1. SELECT * FROM Transacao WHERE remetente_id = ? OR destinatario_id = ?
+        activate bd
+        bd --> transacao_dao
+        deactivate bd
+    transacao_dao --> prof_controller
+    deactivate transacao_dao
+prof_controller --> prof_rota
+deactivate prof_controller
+
+prof_rota --> professor
+deactivate prof_rota
+deactivate professor
+
+@enduml

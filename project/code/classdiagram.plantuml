@@ -47,6 +47,9 @@ class Vantagem {
   - descricao: String
   - foto: String
   - custoMoedas: int
+  - empresa : Empresa
+  - data_cadastro : Date
+  - ativo : Boolean
   + resgatarVantagem(): void
   + registrarVantagem(): void
 }
@@ -58,7 +61,7 @@ class Transacao {
   - valorMoedas: int
   - mensagem: String
   - codigoCupom: String
-  - remetende: Usuario
+  - remetente: Usuario
   - destinatario: Usuario
 }
 

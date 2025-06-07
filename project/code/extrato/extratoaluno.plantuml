@@ -1,0 +1,32 @@
+@startuml
+
+actor "Aluno" as aluno
+participant "alunoRoutes" as aluno_rota
+participant "AlunoController" as aluno_controller
+participant "TransacaoDAO" as transacao_dao
+database "Banco de Dados" as bd
+
+ref over aluno : Realizar login
+
+aluno -> aluno_rota : 1. GET /alunos/extrato
+activate aluno
+activate aluno_rota
+
+aluno_rota -> aluno_controller : 1.1. getExtrato(req,res)
+activate aluno_controller
+    aluno_controller -> transacao_dao : 1.1.1. listarPorDestinatario(usuario_id)
+    activate transacao_dao
+        transacao_dao -> bd : 1.1.1.1. SELECT * FROM Transacao WHERE destinatario_id = ?
+        activate bd
+        bd --> transacao_dao
+        deactivate bd
+    transacao_dao --> aluno_controller
+    deactivate transacao_dao
+aluno_controller --> aluno_rota
+deactivate aluno_controller
+
+aluno_rota --> aluno
+deactivate aluno_rota
+deactivate aluno
+
+@enduml

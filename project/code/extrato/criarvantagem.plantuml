@@ -1,0 +1,48 @@
+@startuml
+
+actor "Empresa Parceira" as empresa
+participant "vantagemRoutes" as rota
+participant "VantagemController" as controller
+participant "VantagemDAO" as dao
+participant "Vantagem Model" as model
+database "Banco de Dados" as bd
+
+ref over empresa : Realizar login
+
+empresa -> rota : 1. POST /vantagens
+activate empresa 
+activate rota 
+
+alt 1.1. req.usuario.tipo != "empresa"
+    rota -> controller : 1.1.1. criar(req,res)
+    activate controller 
+    controller --> rota 
+    deactivate controller
+else
+    rota -> controller : 1.2.1. criar(req,res)
+    activate controller 
+    controller -> dao : 1.2.2. criar(dadosVantagem)
+    activate dao 
+        dao -> bd : 1.2.2.1. INSERT INTO vantagem …
+        activate bd 
+        bd  --> dao 
+        deactivate bd
+        dao -> dao : 1.2.2.3. buscarPorID(id)
+            dao -> bd : 1.2.2.3.1. SELECT * FROM vantagem WHERE id = ?
+            activate bd 
+            bd  --> dao
+            deactivate bd
+            dao -> model : 1.2.2.3.3. new Vantagem()
+            activate model 
+            model --> dao
+            deactivate model
+        dao --> controller
+    deactivate dao
+    controller --> rota
+    deactivate controller
+end
+rota --> empresa
+deactivate rota
+deactivate empresa
+
+@enduml

@@ -1,0 +1,37 @@
+@startuml
+
+actor "Aluno" as aluno
+participant "vantagemRoutes" as rota
+participant "VantagemController" as controller
+participant "VantagemDAO" as dao
+participant "Vantagem Model" as model
+database "Banco de Dados" as bd
+
+ref over aluno : Realizar login
+
+aluno -> rota : 1. GET /vantagens
+activate aluno 
+activate rota 
+
+rota -> controller : 1.1. listarTodasAtivas(req,res)
+activate controller
+    controller -> dao : 1.1.1. listarTodasAtivas()
+    activate dao 
+        dao -> bd : 1.1.1.1. SELECT * FROM vantagem WHERE ativo = TRUE
+        activate bd 
+        bd  --> dao
+        deactivate bd
+        dao -> model : 1.1.1.1. Vantagens
+        activate model 
+        model --> dao
+        deactivate model
+    dao --> controller
+    deactivate dao
+controller --> rota
+deactivate controller
+
+rota --> aluno
+deactivate rota
+deactivate aluno
+
+@enduml

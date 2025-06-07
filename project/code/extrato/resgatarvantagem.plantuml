@@ -1,0 +1,105 @@
+@startuml
+
+actor "Aluno" as aluno
+participant "VantagemRoutes" as vantagem_rota
+participant "VantagemController" as vantagem_controller
+participant "AlunoDAO" as aluno_dao
+participant "VantagemDAO" as vantagem_dao
+participant "TransacaoDAO" as transacao_dao
+participant "EmpresaDAO" as empresa_dao
+participant "notificacoes" as notificacoes
+database "Banco de Dados" as bd
+
+ref over aluno : Realizar login
+
+aluno -> vantagem_rota : 1. POST /vantagens/resgatar
+activate aluno
+activate vantagem_rota
+
+vantagem_rota -> vantagem_controller : 1.1. resgatar(req,res)
+activate vantagem_controller
+
+vantagem_controller -> aluno_dao : 1.1.1. buscarPorID(alunoId)
+activate aluno_dao
+aluno_dao -> bd : SELECT * FROM Aluno WHERE id = ?
+activate bd
+bd --> aluno_dao
+deactivate bd
+aluno_dao --> vantagem_controller
+deactivate aluno_dao
+
+vantagem_controller -> vantagem_dao : 1.1.2. buscarPorID(vantagemId)
+activate vantagem_dao
+vantagem_dao -> bd : SELECT * FROM Vantagem WHERE id = ?
+activate bd
+bd --> vantagem_dao
+deactivate bd
+vantagem_dao --> vantagem_controller
+deactivate vantagem_dao
+
+alt Vantagem não encontrada
+    vantagem_controller --> vantagem_rota 
+else Vantagem inativa
+    vantagem_controller --> vantagem_rota 
+else Saldo insuficiente
+    vantagem_controller --> vantagem_rota 
+else Usuário não é aluno
+    vantagem_controller --> vantagem_rota 
+else Resgate permitido
+    vantagem_controller -> aluno_dao : 1.1.3. atualizar(alunoId, { saldoMoedas: novoSaldo })
+    activate aluno_dao
+    aluno_dao -> bd : UPDATE Aluno SET saldoMoedas = ... WHERE id = ?
+    activate bd
+    bd --> aluno_dao
+    deactivate bd
+    aluno_dao --> vantagem_controller
+    deactivate aluno_dao
+
+    vantagem_controller -> vantagem_dao : 1.1.4. desativar(vantagemId)
+    activate vantagem_dao
+    vantagem_dao -> bd : UPDATE Vantagem SET ativo = false WHERE id = ?
+    activate bd
+    bd --> vantagem_dao
+    deactivate bd
+    vantagem_dao --> vantagem_controller
+    deactivate vantagem_dao
+
+    vantagem_controller -> transacao_dao : 1.1.5. criar({...})
+    activate transacao_dao
+    transacao_dao -> bd : INSERT INTO Transacao (...)
+    activate bd
+    bd --> transacao_dao
+    deactivate bd
+    transacao_dao --> vantagem_controller
+    deactivate transacao_dao
+
+    vantagem_controller -> empresa_dao : 1.1.6. buscarPorID(vantagem.empresa_id)
+    activate empresa_dao
+    empresa_dao -> bd : SELECT * FROM Empresa WHERE id = ?
+    activate bd
+    bd --> empresa_dao
+    deactivate bd
+    empresa_dao --> vantagem_controller
+    deactivate empresa_dao
+
+    vantagem_controller -> notificacoes : 1.1.6. enviar('cupom_gerado', aluno.email, dados)
+    activate notificacoes
+        notificacoes -> notificacoes : 1.1.6.1. sendMail()
+        notificacoes --> vantagem_controller
+    deactivate notificacoes
+
+    vantagem_controller -> notificacoes : 1.1.7. enviar('cupom_emitido', empresa.email, dados)
+    activate notificacoes
+        notificacoes -> notificacoes : 1.1.7.1. sendMail()
+        notificacoes --> vantagem_controller
+    deactivate notificacoes
+
+    vantagem_controller --> vantagem_rota 
+end
+
+deactivate vantagem_controller
+vantagem_rota --> aluno
+deactivate vantagem_rota
+deactivate aluno
+
+@enduml
