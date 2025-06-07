@@ -309,10 +309,25 @@ export default function ExtratoPage() {
   const renderizarBadgeTipo = (tipo, usuario) => {
     const tipoFormatado = formatarTipoTransacao(tipo, usuario);
 
-    if (tipo === "resgate_vantagem" || tipo === "envio_moedas") {
-      return <BadgeEnvio>{tipoFormatado}</BadgeEnvio>;
+    // Nova lógica de cores baseada no fluxo de moedas
+    if (usuario === "aluno") {
+      // Aluno:
+      // - Recebimento: Verde
+      // - Saída: Vermelho
+      if (tipo === "envio_moedas") {
+        return <BadgeRecebimento>{tipoFormatado}</BadgeRecebimento>;
+      } else {
+        return <BadgeEnvio>{tipoFormatado}</BadgeEnvio>;
+      }
     } else {
-      return <BadgeRecebimento>{tipoFormatado}</BadgeRecebimento>;
+      // Professor:
+      // - Saída: Vermelho
+      // - Entrada: Verde
+      if (tipo === "envio_moedas" || tipo === "resgate_vantagem") {
+        return <BadgeEnvio>{tipoFormatado}</BadgeEnvio>;
+      } else {
+        return <BadgeRecebimento>{tipoFormatado}</BadgeRecebimento>;
+      }
     }
   };
 
@@ -420,81 +435,80 @@ export default function ExtratoPage() {
   );
 
   // Renderizar extrato
-  const renderExtrato = (usuario) => {
-    if (carregando) {
-      return <p style={{ textAlign: "center" }}>Carregando extrato...</p>;
-    }
+const renderExtrato = (usuario) => {
+  if (carregando) {
+    return <p style={{ textAlign: "center" }}>Carregando extrato...</p>;
+  }
 
-    if (transacoes.length === 0) {
-      return <p style={{ textAlign: "center" }}>Nenhuma transação encontrada</p>;
-    }
+  if (transacoes.length === 0) {
+    return <p style={{ textAlign: "center" }}>Nenhuma transação encontrada</p>;
+  }
 
-    return (
-      <Tabela>
-        <Cabecalho>
-          <LinhaCabecalho>
-            <CelulaCabecalho>Data</CelulaCabecalho>
-            <CelulaCabecalho>Tipo</CelulaCabecalho>
-            <CelulaCabecalho>Valor</CelulaCabecalho>
-            <CelulaCabecalho>Mensagem</CelulaCabecalho>
-            <CelulaCabecalho>{usuario === "aluno" ? "Origem" : "Destinatário"}</CelulaCabecalho>
-          </LinhaCabecalho>
-        </Cabecalho>
-        <tbody>
-          {transacoes.map((transacao) => {
-            let origemDestino = "";
-            let valorFormatado = "";
-            let corValor = "";
+  return (
+    <Tabela>
+      <Cabecalho>
+        <LinhaCabecalho>
+          <CelulaCabecalho>Data</CelulaCabecalho>
+          <CelulaCabecalho>Tipo</CelulaCabecalho>
+          <CelulaCabecalho>Valor</CelulaCabecalho>
+          <CelulaCabecalho>Mensagem</CelulaCabecalho>
+          <CelulaCabecalho>{usuario === "aluno" ? "Origem/Destino" : "Destinatário"}</CelulaCabecalho>
+        </LinhaCabecalho>
+      </Cabecalho>
+      <tbody>
+        {transacoes.map((transacao) => {
+          let origemDestino = "";
+          let valorFormatado = "";
+          let corValor = "";
 
-            if (usuario === "aluno") {
-              if (transacao.tipo === "envio_moedas") {
-                origemDestino = `${nomesUsuarios[transacao.remetente_id] || `ID ${transacao.remetente_id}`}`;
-                valorFormatado = `+${transacao.valorMoedas}`;
-                corValor = "#2b8a3e";
-              } else if (transacao.tipo === "resgate_vantagem") {
-                origemDestino = `${nomesUsuarios[transacao.destinatario_id] || `ID ${transacao.destinatario_id}`}`;
-                valorFormatado = `-${transacao.valorMoedas}`;
-                corValor = "#c92a2a";
-              }
-            } else {
-              if (transacao.destinatario_id) {
-                origemDestino = `${nomesUsuarios[transacao.destinatario_id] || `ID ${transacao.destinatario_id}`}`;
-              } else {
-                origemDestino = "Instituição";
-              }
-
-              if (transacao.tipo === "envio_moedas") {
-                valorFormatado = `-${transacao.valorMoedas}`;
-                corValor = "#c92a2a";
-              } else {
-                valorFormatado = `+${transacao.valorMoedas}`;
-                corValor = "#2b8a3e";
-              }
+          if (usuario === "aluno") {
+            if (transacao.tipo === "envio_moedas") {
+              // Recebimento de moedas do professor
+              origemDestino = `De: ${nomesUsuarios[transacao.remetente_id] || `Professor ${transacao.remetente_id}`}`;
+              valorFormatado = `+${transacao.valorMoedas}`;
+              corValor = "#2b8a3e";
+            } else if (transacao.tipo === "resgate_vantagem") {
+              // Resgate de vantagem (pagamento para empresa)
+              origemDestino = `Para: ${nomesUsuarios[transacao.destinatario_id] || `Empresa ${transacao.destinatario_id}`}`;
+              valorFormatado = `-${transacao.valorMoedas}`;
+              corValor = "#c92a2a";
             }
+          } else {
+            // Professor
+            if (transacao.tipo === "envio_moedas") {
+              origemDestino = `Para: ${nomesUsuarios[transacao.destinatario_id] || `Aluno ${transacao.destinatario_id}`}`;
+              valorFormatado = `-${transacao.valorMoedas}`;
+              corValor = "#c92a2a";
+            } else if (transacao.tipo === "recarga_instituicao") {
+              origemDestino = "Instituição";
+              valorFormatado = `+${transacao.valorMoedas}`;
+              corValor = "#2b8a3e";
+            }
+          }
 
-            return (
-              <Linha key={transacao.id}>
-                <Celula>{formatarData(transacao.data)}</Celula>
-                <Celula>
-                  {renderizarBadgeTipo(transacao.tipo, usuario)}
-                </Celula>
-                <CelulaCentro>
-                  <span style={{
-                    color: corValor,
-                    fontWeight: "bold"
-                  }}>
-                    {valorFormatado}
-                  </span>
-                </CelulaCentro>
-                <Celula>{transacao.mensagem}</Celula>
-                <Celula>{origemDestino}</Celula>
-              </Linha>
-            );
-          })}
-        </tbody>
-      </Tabela>
-    );
-  };
+          return (
+            <Linha key={transacao.id}>
+              <Celula>{formatarData(transacao.data)}</Celula>
+              <Celula>
+                {renderizarBadgeTipo(transacao.tipo, usuario)}
+              </Celula>
+              <CelulaCentro>
+                <span style={{
+                  color: corValor,
+                  fontWeight: "bold"
+                }}>
+                  {valorFormatado}
+                </span>
+              </CelulaCentro>
+              <Celula>{transacao.mensagem || "-"}</Celula>
+              <Celula>{origemDestino}</Celula>
+            </Linha>
+          );
+        })}
+      </tbody>
+    </Tabela>
+  );
+};
 
   return (
     <Container>

@@ -86,9 +86,10 @@ class VantagemController {
                 tipo: "resgate_vantagem",
                 valorMoedas: vantagem.custoMoedas,
                 mensagem: `Resgate: ${vantagem.nome} - CUPOM: ${codigoCupom}`,
-                remetente_id: alunoId,
-                destinatario_id: vantagem.empresa_id,
+                remetente_id: vantagem.empresa_id,
+                destinatario_id: alunoId,
             });
+
 
             const empresa = await EmpresaDAO.buscarPorID(vantagem.empresa_id);
 
@@ -97,7 +98,7 @@ class VantagemController {
                 vantagemNome: vantagem.nome,
                 empresaNome: empresa.nome,
                 codigoCupom: codigoCupom,
-                dataValidade: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), 
+                dataValidade: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
                 enderecoResgate: empresa.endereco || "Informe no local"
             });
 
