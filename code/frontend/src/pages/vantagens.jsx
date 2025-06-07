@@ -5,7 +5,8 @@ import { jwtDecode } from "jwt-decode";
 import styled from "styled-components";
 import Botao from "../components/Botao";
 import CampoTexto from "../components/CampoTexto";
-import FileUpload from "../components/Upload"
+import FileUpload from "../components/Upload";
+import Modal from "../components/Modal";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -46,6 +47,8 @@ const VantagemCard = styled.div`
   border: 1px solid #e9ecef;
   transition: all 0.3s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
 
   &:hover {
     transform: translateY(-3px);
@@ -72,6 +75,7 @@ const VantagemDescricao = styled.p`
   font-size: 0.9rem;
   margin-bottom: 1rem;
   line-height: 1.4;
+  flex-grow: 1;
 `;
 
 const VantagemPreco = styled.div`
@@ -118,6 +122,43 @@ const MensagemErro = styled(Mensagem)`
   color: #721c24;
 `;
 
+const MensagemSucesso = styled(Mensagem)`
+  background-color: #d4edda;
+  color: #155724;
+`;
+
+const BotaoResgatar = styled(Botao)`
+  margin-top: 0.5rem;
+  width: 100%;
+`;
+
+const ModalContent = styled.div`
+  text-align: center;
+  padding: 1.5rem;
+
+  h3 {
+    color: #2b8a3e;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  .cupom {
+    font-size: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: #2b8a3e;
+    background: #f1f3f5;
+    padding: 1rem;
+    border-radius: 5px;
+    margin: 1rem 0;
+    display: inline-block;
+  }
+`;
+
 export default function VantagensPage() {
   const [vantagens, setVantagens] = useState([]);
   const [novaVantagem, setNovaVantagem] = useState({
@@ -127,7 +168,13 @@ export default function VantagensPage() {
   });
   const [fotoArquivo, setFotoArquivo] = useState(null);
   const [erro, setErro] = useState("");
+  const [sucesso, setSucesso] = useState("");
   const [tipoUsuario, setTipoUsuario] = useState("");
+  const [saldoAluno, setSaldoAluno] = useState(0);
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [cupomResgate, setCupomResgate] = useState(null);
+  const [vantagemResgatada, setVantagemResgatada] = useState(null);
+  const [empresaResgate, setEmpresaResgate] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -139,7 +186,22 @@ export default function VantagensPage() {
 
     const decoded = jwtDecode(token);
     setTipoUsuario(decoded.tipo);
+
+    if (decoded.tipo === "aluno") {
+      carregarSaldoAluno(token, decoded.id);
+    }
   }, [navigate]);
+
+  const carregarSaldoAluno = async (token, alunoId) => {
+    try {
+      const response = await axios.get(`http://localhost:3000/api/alunos/${alunoId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setSaldoAluno(response.data.saldoMoedas);
+    } catch (error) {
+      console.error("Erro ao carregar saldo do aluno:", error);
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -200,12 +262,52 @@ export default function VantagensPage() {
       setNovaVantagem({ nome: "", descricao: "", custoMoedas: 0 });
       setFotoArquivo(null);
       setErro("");
+      setSucesso("Vantagem criada com sucesso!");
+      setTimeout(() => setSucesso(""), 3000);
     } catch (error) {
       setErro(error.response?.data?.erro || "Erro ao criar vantagem");
+      setTimeout(() => setErro(""), 3000);
+    }
+  };
+
+  const handleResgatarVantagem = async (vantagemId) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+
+      const response = await axios.post(
+        "http://localhost:3000/api/vantagens/resgatar",
+        { vantagemId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // Atualizar o saldo do aluno localmente
+      setSaldoAluno(response.data.saldoAtual);
+
+      // Mostrar modal com o cupom
+      setCupomResgate(response.data.cupom);
+      setVantagemResgatada(response.data.detalhesVantagem);
+      setMostrarModal(true);
+
+      // Atualizar a lista de vantagens para refletir que esta foi resgatada
+      setVantagens(vantagens.map(v => 
+        v.id === vantagemId ? { ...v, ativo: false } : v
+      ));
+
+      setSucesso("Vantagem resgatada com sucesso!");
+      setTimeout(() => setSucesso(""), 5000);
+    } catch (error) {
+      console.error("Erro ao resgatar vantagem:", error);
+      setErro(error.response?.data?.erro || "Erro ao resgatar vantagem");
+      setTimeout(() => setErro(""), 3000);
     }
   };
 
   function obterUrlFoto(foto) {
+    if (!foto) return "https://via.placeholder.com/300x160?text=Sem+Imagem";
     if (foto.startsWith("http")) {
       return foto;
     }
@@ -220,6 +322,14 @@ export default function VantagensPage() {
           ? "Minhas Vantagens"
           : "Vantagens Disponíveis"}
       </FormTitulo>
+
+      {tipoUsuario === "aluno" && (
+        <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+          <p style={{ fontSize: "1.1rem", fontWeight: "bold" }}>
+            Saldo disponível: <span style={{ color: "#2b8a3e" }}>{saldoAluno} moedas</span>
+          </p>
+        </div>
+      )}
 
       {vantagens.length === 0 ? (
         <p style={{ color: "#868e96", textAlign: "center" }}>
@@ -236,11 +346,30 @@ export default function VantagensPage() {
               <VantagemTitulo>{vantagem.nome}</VantagemTitulo>
               <VantagemDescricao>{vantagem.descricao}</VantagemDescricao>
               <VantagemPreco>{vantagem.custoMoedas} moedas</VantagemPreco>
+              
               {tipoUsuario === "empresa" && (
                 <VantagemData>
                   Cadastrada em:{" "}
                   {new Date(vantagem.data_cadastro).toLocaleDateString()}
                 </VantagemData>
+              )}
+
+              {tipoUsuario === "aluno" && vantagem.ativo && (
+                <BotaoResgatar
+                  tipo="primario"
+                  onClick={() => handleResgatarVantagem(vantagem.id)}
+                  disabled={saldoAluno < vantagem.custoMoedas}
+                >
+                  {saldoAluno < vantagem.custoMoedas 
+                    ? "Saldo insuficiente" 
+                    : "Resgatar"}
+                </BotaoResgatar>
+              )}
+
+              {tipoUsuario === "aluno" && !vantagem.ativo && (
+                <BotaoResgatar tipo="secundario" disabled>
+                  Já resgatada
+                </BotaoResgatar>
               )}
             </VantagemCard>
           ))}
@@ -259,6 +388,7 @@ export default function VantagensPage() {
         </Titulo>
 
         {erro && <MensagemErro>{erro}</MensagemErro>}
+        {sucesso && <MensagemSucesso>{sucesso}</MensagemSucesso>}
 
         {tipoUsuario === "empresa" && (
           <FormVantagem>
@@ -318,6 +448,26 @@ export default function VantagensPage() {
 
         {renderVantagens()}
       </CardForm>
+
+      <Modal mostrar={mostrarModal} aoFechar={() => setMostrarModal(false)}>
+        <ModalContent>
+          <h3>Vantagem Resgatada com Sucesso!</h3>
+          <p>
+            Você resgatou a vantagem <strong>{vantagemResgatada?.nome}</strong> da empresa{" "}
+            <strong>{vantagemResgatada?.empresa}</strong>.
+          </p>
+          <p>Apresente o cupom abaixo no local indicado para usufruir de seu benefício:</p>
+          <div className="cupom">{cupomResgate}</div>
+          <p>Este cupom é válido por 7 dias a partir de hoje.</p>
+          <Botao
+            tipo="primario"
+            onClick={() => setMostrarModal(false)}
+            style={{ marginTop: "1rem" }}
+          >
+            Entendi
+          </Botao>
+        </ModalContent>
+      </Modal>
     </Container>
   );
 }
