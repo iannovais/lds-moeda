@@ -93,24 +93,28 @@ class VantagemController {
 
             const empresa = await EmpresaDAO.buscarPorID(vantagem.empresa_id);
 
-            await notificacoes.enviar('cupom_gerado', aluno.email, {
+            notificacoes.enviar('cupom_gerado', aluno.email, {
                 alunoNome: aluno.nome,
                 vantagemNome: vantagem.nome,
                 empresaNome: empresa.nome,
                 codigoCupom: codigoCupom,
                 dataValidade: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
                 enderecoResgate: empresa.endereco || "Informe no local"
+            }).catch((err) => {
+                console.error("Erro ao enviar email para o aluno:", err);
             });
 
-            await notificacoes.enviar('cupom_emitido', empresa.email, {
+            notificacoes.enviar('cupom_emitido', empresa.email, {
                 empresaNome: empresa.nome,
                 alunoNome: aluno.nome,
                 vantagemNome: vantagem.nome,
                 codigoCupom: codigoCupom,
                 dataResgate: new Date().toLocaleDateString(),
                 valorMoedas: vantagem.custoMoedas
+            }).catch((err) => {
+                console.error("Erro ao enviar email para a empresa:", err);
             });
-
+            
             res.status(200).json({
                 mensagem: "Vantagem resgatada com sucesso!",
                 cupom: codigoCupom,

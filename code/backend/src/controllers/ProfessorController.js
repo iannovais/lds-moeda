@@ -112,7 +112,7 @@ class ProfessorController {
                 saldoMoedas: aluno.saldoMoedas + valor
             });
 
-            await notificacoes.enviar('moedas_recebidas', aluno.email, {
+            notificacoes.enviar('moedas_recebidas', aluno.email, {
                 alunoNome: aluno.nome,
                 remetenteNome: professor.nome,
                 valor: valor,
