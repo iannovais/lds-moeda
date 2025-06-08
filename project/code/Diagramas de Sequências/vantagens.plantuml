@@ -4,7 +4,6 @@ actor "Aluno" as aluno
 participant "vantagemRoutes" as rota
 participant "VantagemController" as controller
 participant "VantagemDAO" as dao
-participant "Vantagem Model" as model
 database "Banco de Dados" as bd
 
 ref over aluno : Realizar login
@@ -21,10 +20,13 @@ activate controller
         activate bd 
         bd  --> dao
         deactivate bd
-        dao -> model : 1.1.1.1. Vantagens
+
+        create "Vantagem Model" as model
+        dao -> model : 1.1.1.2. New() Vantagem
         activate model 
         model --> dao
         deactivate model
+
     dao --> controller
     deactivate dao
 controller --> rota
