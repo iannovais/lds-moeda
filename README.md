@@ -10,4 +10,11 @@ O sistema de moeda estudantil visa automatizar o reconhecimento de alunos, profe
 * Cleiton Silva Tavares
 
 ## Instruções de utilização
-Assim que a primeira versão do sistema estiver disponível, deverá complementar com as instruções de utilização. Descreva como instalar eventuais dependências e como executar a aplicação.
+- Abra o projeto
+- Navegue até o backend ```cd code/backend```
+- Instale as dependências do backend ```npm i```
+- Execute o backend ```npm start```
+- Navegue até o frontend ```cd code/frontend```
+- Instale as dependências do frontend ```npm i```
+- Execute o frontend ```npm start```
+- O projeto estará rodando em ```http://localhost:3001/```
