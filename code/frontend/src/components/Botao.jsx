@@ -13,6 +13,11 @@ const StyledButton = styled.button`
   &:hover {
     background-color: #28b463;
   }
+
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
 `
 
 export default function Botao({ children, ...props }) {
