@@ -13,6 +13,9 @@ O sistema de moeda estudantil visa automatizar o reconhecimento de alunos, profe
 - Abra o projeto
 - Navegue até o backend ```cd code/backend```
 - Instale as dependências do backend ```npm i```
+- Configure o .env com as informações para o envio de email
+- Configure o bd em ```backend/config/db.js```
+- Execute a query de criação do banco no mysql (A query se encontra na pasta backend)
 - Execute o backend ```npm start```
 - Navegue até o frontend ```cd code/frontend```
 - Instale as dependências do frontend ```npm i```
