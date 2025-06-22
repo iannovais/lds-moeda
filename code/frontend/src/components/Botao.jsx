@@ -2,7 +2,7 @@ import styled from "styled-components"
 
 const StyledButton = styled.button`
   background-color: var(--verde-principal);
-  color: #fff;
+  color: var(--branco);
   border: none;
   padding: 0.75rem;
   border-radius: 4px;
@@ -11,14 +11,14 @@ const StyledButton = styled.button`
   transition: background-color 0.2s ease;
 
   &:hover {
-    background-color: #28b463;
+    background-color: var(--verde-claro);
   }
 
   &:disabled {
-    background-color: #ccc;
+    background-color: var(--cinza-claro);
     cursor: not-allowed;
   }
-`
+`;
 
 export default function Botao({ children, ...props }) {
   return <StyledButton {...props}>{children}</StyledButton>

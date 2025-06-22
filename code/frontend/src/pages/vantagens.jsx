@@ -7,6 +7,7 @@ import Botao from "../components/Botao";
 import CampoTexto from "../components/CampoTexto";
 import FileUpload from "../components/Upload";
 import Modal from "../components/Modal";
+import { Mensagem, MensagemSucesso, MensagemErro } from "../components/MensagensEstilizadas";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -108,23 +109,6 @@ const FormTitulo = styled.h3`
   margin-top: 0;
   margin-bottom: 1.5rem;
   font-size: 1.2rem;
-`;
-
-const Mensagem = styled.div`
-  padding: 0.75rem;
-  border-radius: 5px;
-  margin-bottom: 1rem;
-  font-weight: 500;
-`;
-
-const MensagemErro = styled(Mensagem)`
-  background-color: #f8d7da;
-  color: #721c24;
-`;
-
-const MensagemSucesso = styled(Mensagem)`
-  background-color: #d4edda;
-  color: #155724;
 `;
 
 const BotaoResgatar = styled(Botao)`
