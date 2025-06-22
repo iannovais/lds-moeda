@@ -5,6 +5,7 @@ import { jwtDecode } from "jwt-decode";
 import styled from "styled-components";
 import Botao from "../components/Botao";
 import CampoTexto from "../components/CampoTexto";
+import { Mensagem, MensagemSucesso, MensagemErro } from "../components/MensagensEstilizadas";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -45,23 +46,6 @@ const ConteudoAba = styled.div`
   background: white;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-`;
-
-const Mensagem = styled.div`
-  padding: 0.75rem;
-  border-radius: 5px;
-  margin-bottom: 1rem;
-  font-weight: 500;
-`;
-
-const MensagemSucesso = styled(Mensagem)`
-  background-color: #d4edda;
-  color: #155724;
-`;
-
-const MensagemErro = styled(Mensagem)`
-  background-color: #f8d7da;
-  color: #721c24;
 `;
 
 const Tabela = styled.table`

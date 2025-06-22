@@ -5,6 +5,7 @@ import { jwtDecode } from "jwt-decode";
 import styled from "styled-components";
 import Botao from "../components/Botao";
 import CampoTexto from "../components/CampoTexto";
+import { Mensagem, MensagemSucesso, MensagemErro } from "../components/MensagensEstilizadas";
 
 const SectionTitulo = styled.h2`
   font-size: 1.2rem;
@@ -37,23 +38,6 @@ const Titulo = styled.h1`
   color: #2b8a3e;
   margin-bottom: 2rem;
   font-size: 1.8rem;
-`;
-
-const Mensagem = styled.div`
-  padding: 0.75rem;
-  border-radius: 5px;
-  margin-bottom: 1rem;
-  font-weight: 500;
-`;
-
-const MensagemSucesso = styled(Mensagem)`
-  background-color: #d4edda;
-  color: #155724;
-`;
-
-const MensagemErro = styled(Mensagem)`
-  background-color: #f8d7da;
-  color: #721c24;
 `;
 
 const Grupo = styled.div`

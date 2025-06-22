@@ -14,5 +14,11 @@ code {
 
 :root {
   --verde-principal: #2ecc71;
+  --verde-claro: #2ecc71;
+  --vermelho-erro: #c92a2a;
   --cinza-fundo: #f0f2f5;
+  --cinza-texto: #495057;
+  --cinza-claro: #868e96;
+  --branco: #ffffff;
+  --sombra: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
