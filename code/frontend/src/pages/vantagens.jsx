@@ -7,6 +7,7 @@ import Botao from "../components/Botao";
 import CampoTexto from "../components/CampoTexto";
 import FileUpload from "../components/Upload";
 import Modal from "../components/Modal";
+import Vantagem from "../components/vantagem";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -40,61 +41,6 @@ const VantagensGrid = styled.div`
   margin-top: 1.5rem;
 `;
 
-const VantagemCard = styled.div`
-  background: white;
-  border-radius: 8px;
-  padding: 1.25rem;
-  border: 1px solid #e9ecef;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  display: flex;
-  flex-direction: column;
-
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-`;
-
-const VantagemImagem = styled.img`
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
-  border-radius: 6px;
-  margin-bottom: 1rem;
-`;
-
-const VantagemTitulo = styled.h4`
-  color: #2b8a3e;
-  margin: 0 0 0.5rem 0;
-  font-size: 1.1rem;
-`;
-
-const VantagemDescricao = styled.p`
-  color: #495057;
-  font-size: 0.9rem;
-  margin-bottom: 1rem;
-  line-height: 1.4;
-  flex-grow: 1;
-`;
-
-const VantagemPreco = styled.div`
-  background: #f1f3f5;
-  padding: 0.5rem;
-  border-radius: 4px;
-  text-align: center;
-  font-weight: bold;
-  color: #2b8a3e;
-  margin-top: auto;
-`;
-
-const VantagemData = styled.small`
-  display: block;
-  color: #868e96;
-  margin-top: 0.5rem;
-  font-size: 0.75rem;
-`;
-
 const FormVantagem = styled.div`
   background: #f8f9fa;
   padding: 1.5rem;
@@ -125,11 +71,6 @@ const MensagemErro = styled(Mensagem)`
 const MensagemSucesso = styled(Mensagem)`
   background-color: #d4edda;
   color: #155724;
-`;
-
-const BotaoResgatar = styled(Botao)`
-  margin-top: 0.5rem;
-  width: 100%;
 `;
 
 const ModalContent = styled.div`
@@ -174,7 +115,6 @@ export default function VantagensPage() {
   const [mostrarModal, setMostrarModal] = useState(false);
   const [cupomResgate, setCupomResgate] = useState(null);
   const [vantagemResgatada, setVantagemResgatada] = useState(null);
-  const [empresaResgate, setEmpresaResgate] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -190,6 +130,8 @@ export default function VantagensPage() {
     if (decoded.tipo === "aluno") {
       carregarSaldoAluno(token, decoded.id);
     }
+
+    carregarVantagens(token, decoded.tipo);
   }, [navigate]);
 
   const carregarSaldoAluno = async (token, alunoId) => {
@@ -203,36 +145,22 @@ export default function VantagensPage() {
     }
   };
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-
-    const decoded = jwtDecode(token);
-    const tipo = decoded.tipo;
-    setTipoUsuario(tipo);
-
-    const carregarVantagens = async () => {
-      try {
-        let endpoint = "/api/vantagens";
-        if (tipo === "empresa") {
-          endpoint = "/api/vantagens/minhas-vantagens";
-        }
-
-        const { data } = await axios.get(`http://localhost:3000${endpoint}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        setVantagens(data);
-      } catch (error) {
-        console.error("Erro ao carregar vantagens:", error);
+  const carregarVantagens = async (token, tipo) => {
+    try {
+      let endpoint = "/api/vantagens";
+      if (tipo === "empresa") {
+        endpoint = "/api/vantagens/minhas-vantagens";
       }
-    };
 
-    carregarVantagens();
-  }, [navigate]);
+      const { data } = await axios.get(`http://localhost:3000${endpoint}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setVantagens(data);
+    } catch (error) {
+      console.error("Erro ao carregar vantagens:", error);
+    }
+  };
 
   const handleArquivoFoto = (e) => {
     const arquivo = e.target.files[0];
@@ -306,15 +234,6 @@ export default function VantagensPage() {
     }
   };
 
-  function obterUrlFoto(foto) {
-    if (!foto) return "https://via.placeholder.com/300x160?text=Sem+Imagem";
-    if (foto.startsWith("http")) {
-      return foto;
-    }
-    const caminho = foto.startsWith("/") ? foto.substring(1) : foto;
-    return `http://localhost:3000/${caminho}`;
-  }
-
   const renderVantagens = () => (
     <div>
       <FormTitulo>
@@ -338,40 +257,13 @@ export default function VantagensPage() {
       ) : (
         <VantagensGrid>
           {vantagens.map((vantagem) => (
-            <VantagemCard key={vantagem.id}>
-              <VantagemImagem
-                src={obterUrlFoto(vantagem.foto)}
-                alt={vantagem.nome}
-              />
-              <VantagemTitulo>{vantagem.nome}</VantagemTitulo>
-              <VantagemDescricao>{vantagem.descricao}</VantagemDescricao>
-              <VantagemPreco>{vantagem.custoMoedas} moedas</VantagemPreco>
-              
-              {tipoUsuario === "empresa" && (
-                <VantagemData>
-                  Cadastrada em:{" "}
-                  {new Date(vantagem.data_cadastro).toLocaleDateString()}
-                </VantagemData>
-              )}
-
-              {tipoUsuario === "aluno" && vantagem.ativo && (
-                <BotaoResgatar
-                  tipo="primario"
-                  onClick={() => handleResgatarVantagem(vantagem.id)}
-                  disabled={saldoAluno < vantagem.custoMoedas}
-                >
-                  {saldoAluno < vantagem.custoMoedas 
-                    ? "Saldo insuficiente" 
-                    : "Resgatar"}
-                </BotaoResgatar>
-              )}
-
-              {tipoUsuario === "aluno" && !vantagem.ativo && (
-                <BotaoResgatar tipo="secundario" disabled>
-                  Já resgatada
-                </BotaoResgatar>
-              )}
-            </VantagemCard>
+            <Vantagem
+              key={vantagem.id}
+              vantagem={vantagem}
+              tipoUsuario={tipoUsuario}
+              saldoAluno={saldoAluno}
+              onResgatar={handleResgatarVantagem}
+            />
           ))}
         </VantagensGrid>
       )}
