@@ -7,6 +7,8 @@ const alunoRoutes = require("./routes/alunoRoutes");
 const empresaRoutes = require("./routes/empresaRoutes");
 const vantagemRoutes = require("./routes/vantagemRoutes");
 const professorRoutes = require("./routes/professorRoutes");
+const ProfessorController = require('./controllers/ProfessorController');
+const cron = require('node-cron');
 
 const app = express();
 
@@ -25,6 +27,16 @@ app.use("/api/alunos", alunoRoutes);
 app.use("/api/empresas", empresaRoutes);
 app.use("/api/vantagens", vantagemRoutes);
 app.use("/api/professor", professorRoutes);
+
+cron.schedule('0 0 1 * *', async () => {
+    console.log('Iniciando envio mensal de moedas...');
+    try {
+        await ProfessorController.enviarMoedasMensais();
+        console.log('Envio mensal de moedas concluído com sucesso!');
+    } catch (error) {
+        console.error('Falha no envio mensal de moedas:', error);
+    }
+});
 
 const PORT = 3000;
 app.listen(PORT, () => console.log(`Servidor rodando online e roteando 😎`));

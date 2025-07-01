@@ -61,11 +61,11 @@ CREATE TABLE vantagem (
 CREATE TABLE Transacao (
   id INT AUTO_INCREMENT PRIMARY KEY,
   data DATETIME DEFAULT CURRENT_TIMESTAMP,
-  tipo ENUM('envio_moedas') NOT NULL,
+  tipo ENUM('envio_moedas', 'recarga_instituicao') NOT NULL,
   valorMoedas INT NOT NULL,
   mensagem TEXT,
-  remetente_id INT NOT NULL,  
+  remetente_id INT NULL,  
   destinatario_id INT NOT NULL,
-  FOREIGN KEY (remetente_id) REFERENCES Professor(id),
-  FOREIGN KEY (destinatario_id) REFERENCES Aluno(id)
+  FOREIGN KEY (remetente_id) REFERENCES Usuario(id),
+  FOREIGN KEY (destinatario_id) REFERENCES Usuario(id)
 );

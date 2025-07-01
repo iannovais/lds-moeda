@@ -1,6 +1,8 @@
 const ProfessorDAO = require("../dao/professorDAO");
 const TransacaoDAO = require("../dao/transacaoDAO");
 const AlunoDAO = require("../dao/alunoDAO");
+const InstituicaoEnsinoDAO = require("../dao/instituicaoEnsinoDAO");
+const InstituicaoEnsino = require("../models/instituicaoEnsino");
 
 const { cpf: cpfValidator } = require("cpf-cnpj-validator");
 
@@ -81,8 +83,8 @@ class ProfessorController {
                 return res.status(400).json({ erro: "Saldo insuficiente" });
             }
 
-            if(valor <= 0) {
-                return res.status(400).json({ erro: "Você não pode enviar valor negativo ou zero!"})
+            if (valor <= 0) {
+                return res.status(400).json({ erro: "Você não pode enviar valor negativo ou zero!" })
             }
 
             const aluno = await AlunoDAO.buscarPorID(alunoId);
@@ -97,7 +99,7 @@ class ProfessorController {
             const transacao = await TransacaoDAO.criar({
                 tipo: "envio_moedas",
                 valorMoedas: valor,
-                mensagem: mensagem, 
+                mensagem: mensagem,
                 remetente_id: professorId,
                 destinatario_id: alunoId
             });
@@ -126,6 +128,39 @@ class ProfessorController {
         } catch (error) {
             console.error("Erro ao buscar extrato:", error);
             res.status(500).json({ erro: "Erro ao buscar extrato" });
+        }
+    }
+
+    async enviarMoedasMensais() {
+        try {
+            const professores = await ProfessorDAO.listarTodos();
+
+            for (const professor of professores) {
+                const instituicao = await InstituicaoEnsinoDAO.buscarPorID(professor.id_instituicao);
+                if (!instituicao) {
+                    console.warn(`Instituição não encontrada para o professor ${professor.nome}`);
+                    continue;
+                }
+
+                const valorEnvio = instituicao.MAXENVIOPARAPROFESSOR;
+
+                await ProfessorDAO.atualizar(professor.id, {
+                    saldoMoedas: professor.saldoMoedas + valorEnvio
+                });
+
+                await TransacaoDAO.criar({
+                    tipo: "recarga_instituicao",
+                    valorMoedas: valorEnvio,
+                    mensagem: `Recarga mensal de ${valorEnvio} moedas`,
+                    remetente_id: null,
+                    destinatario_id: professor.id
+                });
+            }
+
+            console.log(`Recarga mensal concluída para ${professores.length} professores`);
+        } catch (error) {
+            console.error("Erro no envio mensal de moedas:", error);
+            throw error;
         }
     }
 }
